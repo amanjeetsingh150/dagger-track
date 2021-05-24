@@ -2,21 +2,27 @@ package com.droidsingh.daggertrack
 
 import com.android.build.api.transform.QualifiedContent
 import com.android.build.api.transform.Transform
+import com.android.build.api.transform.TransformInvocation
+import org.gradle.api.Project
 
-internal class DaggerTrackTransform: Transform() {
-    override fun getName(): String {
-        TODO()
+internal class DaggerTrackTransform(project: Project) : Transform() {
+
+    private val logger = project.logger
+
+    companion object {
+        private const val TRANSFORM_NAME = "DAGGER_TRACK"
     }
 
-    override fun getInputTypes(): MutableSet<QualifiedContent.ContentType> {
-        TODO()
-    }
+    override fun getName() = TRANSFORM_NAME
 
-    override fun getScopes(): MutableSet<in QualifiedContent.Scope> {
-        TODO()
-    }
+    override fun getInputTypes() = setOf(QualifiedContent.DefaultContentType.CLASSES)
 
-    override fun isIncremental(): Boolean {
+    override fun getScopes() = mutableSetOf(QualifiedContent.Scope.PROJECT)
+
+    override fun isIncremental() = false
+
+    override fun transform(transformInvocation: TransformInvocation) {
+        super.transform(transformInvocation)
         TODO()
     }
 }
