@@ -17,6 +17,6 @@ class DaggerTrackPlugin : Plugin<Project>{
             )
         }
         val android = target.extensions.findByName("android") as BaseExtension
-        android.registerTransform(DaggerTrackTransform(target))
+        android.registerTransform(DaggerTrackTransform(target, android))
     }
 }

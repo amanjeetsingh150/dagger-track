@@ -3,10 +3,14 @@ package com.droidsingh.daggertrack
 import com.android.build.api.transform.QualifiedContent
 import com.android.build.api.transform.Transform
 import com.android.build.api.transform.TransformInvocation
+import com.android.build.gradle.BaseExtension
 import javassist.ClassPool
 import org.gradle.api.Project
 
-internal class DaggerTrackTransform(project: Project) : Transform() {
+internal class DaggerTrackTransform(
+    project: Project,
+    private val android: BaseExtension
+) : Transform() {
 
     private val logger = project.logger
 
@@ -25,7 +29,7 @@ internal class DaggerTrackTransform(project: Project) : Transform() {
     override fun transform(transformInvocation: TransformInvocation) {
         super.transform(transformInvocation)
         val defaultClassPool = ClassPool.getDefault()
-        val classPoolManager = ClassPoolManager(defaultClassPool)
-        val classPool = classPoolManager.buildProjectClassPool(transformInvocation)
+        val classPoolFactory = ClassPoolFactory(defaultClassPool)
+        val classPool = classPoolFactory.buildProjectClassPool(transformInvocation, android)
     }
 }
