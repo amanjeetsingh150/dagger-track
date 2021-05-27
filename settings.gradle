@@ -1,3 +1,4 @@
 rootProject.name = "DaggerTrack"
 include ':app'
 include ':dagger-track'
+include ':dagger-track-clocks'
