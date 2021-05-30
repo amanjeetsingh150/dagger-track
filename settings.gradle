@@ -1,0 +1,3 @@
+rootProject.name = "DaggerTrack"
+include ':app'
+include ':dagger-track'
