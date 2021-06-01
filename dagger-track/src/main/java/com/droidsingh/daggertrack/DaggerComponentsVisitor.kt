@@ -18,6 +18,7 @@ internal class DaggerComponentsVisitorImpl : DaggerComponentsVisitor {
     }
 
     private fun setComponentTracking(component: CtClass) {
+        defrostCtClass(component)
         component.declaredMethods.filter { it.name == "inject" }.forEach { injectMethod ->
             val injectParam = injectMethod.parameterTypes.first().name
             setTrackingLogs(injectMethod, injectParam)
@@ -44,5 +45,11 @@ internal class DaggerComponentsVisitorImpl : DaggerComponentsVisitor {
                     android.util.Log.d("DaggerTrack","Total Off CPU time of ${injectParam}: " + ((endTime - initialTime) - (endCpuTime - initialCpuTime)));
                 """.trimIndent()
         )
+    }
+
+    private fun defrostCtClass(ctClass: CtClass) {
+        if (ctClass.isFrozen) {
+            ctClass.defrost()
+        }
     }
 }

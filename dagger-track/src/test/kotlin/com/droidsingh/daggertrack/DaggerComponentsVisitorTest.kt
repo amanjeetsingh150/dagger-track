@@ -7,6 +7,7 @@ import com.nhaarman.mockitokotlin2.whenever
 import javassist.ClassPool
 import javassist.CtClass
 import javassist.CtMethod
+import org.junit.Before
 import org.junit.Test
 
 internal class DaggerComponentsVisitorTest {
@@ -26,9 +27,8 @@ internal class DaggerComponentsVisitorTest {
                 ".HomeActivitySubcomponentImpl.HomeFragmentSubcomponentImpl"
     )
 
-    @Test
-    fun `it visits the components and their subcomponents and add tracking logs on inject`() {
-        // given
+    @Before
+    fun setup() {
         val activitySubcomponent = classPool.makeInterface(
             "com.droidsingh.daggertrack.di.components.HomeActivitySubcomponent"
         )
@@ -41,7 +41,10 @@ internal class DaggerComponentsVisitorTest {
         whenever(activitySubcomponentImpl.nestedClasses).thenReturn(arrayOf(fragmentSubcomponentImpl))
         whenever(activitySubcomponentImpl.interfaces).thenReturn(arrayOf(activitySubcomponent))
         whenever(fragmentSubcomponentImpl.interfaces).thenReturn(arrayOf(fragmentSubcomponent))
+    }
 
+    @Test
+    fun `it visits the components and their subcomponents and add tracking logs on inject`() {
         // when
         val daggerComponentsVisitor = DaggerComponentsVisitorImpl()
         daggerComponentsVisitor.visit(applicationComponent)
@@ -71,6 +74,23 @@ internal class DaggerComponentsVisitorTest {
             """.trimIndent()
                 )
             }
+    }
+
+    @Test
+    fun `it defrost the component if its frozen`() {
+        // given
+        whenever(applicationComponent.isFrozen).thenReturn(true)
+        whenever(activitySubcomponentImpl.isFrozen).thenReturn(true)
+        whenever(fragmentSubcomponentImpl.isFrozen).thenReturn(true)
+
+        // when
+        val daggerComponentsVisitor = DaggerComponentsVisitorImpl()
+        daggerComponentsVisitor.visit(applicationComponent)
+
+        // then
+        verify(applicationComponent).defrost()
+        verify(activitySubcomponentImpl).defrost()
+        verify(fragmentSubcomponentImpl).defrost()
     }
 
     private fun prepareComponent(injectParam: String, componentName: String): CtClass {
