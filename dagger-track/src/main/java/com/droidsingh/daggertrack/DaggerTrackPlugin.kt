@@ -16,7 +16,12 @@ class DaggerTrackPlugin : Plugin<Project>{
                 "'com.android.application' or 'com.android.library' plugin required."
             )
         }
+        val extension = target.extensions.create("daggerTrack", DaggerTrackExtension::class.java)
         val android = target.extensions.findByName("android") as BaseExtension
-        android.registerTransform(DaggerTrackTransform(target, android))
+        android.registerTransform(DaggerTrackTransform(target, android, extension))
+    }
+
+    open class DaggerTrackExtension {
+        var applyFor: Array<String>? = null
     }
 }

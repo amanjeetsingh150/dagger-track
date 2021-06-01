@@ -5,12 +5,17 @@ import com.android.build.api.transform.QualifiedContent
 import com.android.build.api.transform.Transform
 import com.android.build.api.transform.TransformInvocation
 import com.android.build.gradle.BaseExtension
+import com.droidsingh.daggertrack.DaggerTrackPlugin.DaggerTrackExtension
 import javassist.ClassPool
+import javassist.CtClass
+import javassist.NotFoundException
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 
 internal class DaggerTrackTransform(
     project: Project,
-    private val android: BaseExtension
+    private val android: BaseExtension,
+    private val daggerTrackExtension: DaggerTrackExtension
 ) : Transform() {
 
     private val logger = project.logger
@@ -35,6 +40,10 @@ internal class DaggerTrackTransform(
 
     override fun transform(transformInvocation: TransformInvocation) {
         super.transform(transformInvocation)
+        if (daggerTrackExtension.applyFor?.isEmpty() != false) {
+            throw GradleException("No variants configured for Dagger Track transform plugin")
+        }
+        val variantName = transformInvocation.context.variantName
         val outputDir = transformInvocation.outputProvider.getContentLocation(
             name,
             outputTypes,
@@ -48,14 +57,29 @@ internal class DaggerTrackTransform(
             transformInvocation,
             android
         )
+        val shouldApplyTransform = daggerTrackExtension.applyFor?.find {
+            variantName.endsWith(it, true)
+        } != null
         val allCtClasses = classPool.mapToCtClassList(transformInvocation)
-        val daggerComponentCtClasses = allCtClasses.filterDaggerComponents()
-        val daggerComponentsVisitor = DaggerComponentsVisitorImpl()
-        daggerComponentCtClasses.forEach {
-            daggerComponentsVisitor.visit(it)
+        val daggerComponentCtClasses = mutableListOf<CtClass>()
+        if (shouldApplyTransform) {
+            validateDaggerClocks(classPool)
+            daggerComponentCtClasses += allCtClasses.filterDaggerComponents()
+            val daggerComponentsVisitor = DaggerComponentsVisitorImpl()
+            daggerComponentCtClasses.forEach {
+                daggerComponentsVisitor.visit(it)
+            }
+            daggerComponentCtClasses.copyCtClasses(outputDir.canonicalPath)
         }
         copyAllJars(transformInvocation)
-        daggerComponentCtClasses.copyCtClasses(outputDir.canonicalPath)
         (allCtClasses - daggerComponentCtClasses).copyCtClasses(outputDir.canonicalPath)
+    }
+
+    private fun validateDaggerClocks(classPool: ClassPool) {
+        try {
+            classPool.get("com.droidsingh.daggertrack.DaggerTrackClocks")
+        } catch (notFoundException: NotFoundException) {
+            throw GradleException("\"dagger-track-clocks\" dependency needed for dagger-track plugin")
+        }
     }
 }
