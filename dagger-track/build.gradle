@@ -26,8 +26,8 @@ dependencies {
 gradlePlugin {
     plugins {
         daggerTrack {
-            id = "com.droidsingh.daggertrack"
-            implementationClass = "com.droidsingh.daggertrack.DaggerTrackPlugin"
+            id = "me.amanjeet.daggertrack"
+            implementationClass = "me.amanjeet.daggertrack.DaggerTrackPlugin"
         }
     }
 }
