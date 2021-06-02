@@ -1,0 +1,48 @@
+site_name: DaggerTrack
+repo_name: DaggerTrack
+repo_url: https://github.com/amanjeetsingh150/dagger-track
+site_description: "A gradle plugin that automatically adds clock tracking for your components and subcomponents."
+site_author: Amanjeet Singh
+remote_branch: gh-pages
+
+copyright: 'Copyright &copy; 2020 Amanjeet Singh'
+
+theme:
+  name: 'material'
+  favicon: images/slack_logo_small.png
+  logo: images/clock.png
+  palette:
+    primary: 'white'
+    accent: 'white'
+  language: 'en'
+  font:
+    text: 'Lato'
+    code: 'Fira Code'
+
+extra_css:
+  - 'css/app.css'
+
+markdown_extensions:
+  - smarty
+  - codehilite:
+      guess_lang: false
+  - footnotes
+  - meta
+  - toc:
+      permalink: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.emoji
+  - tables
+  - mdx_truly_sane_lists
+  - admonition
+
+nav:
+  - 'Overview': index.md
+
+
