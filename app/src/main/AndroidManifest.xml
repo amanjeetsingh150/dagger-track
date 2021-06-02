@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.droidsingh.daggertrack">
+    package="me.amanjeet.daggertrack">
 
     <application
         android:allowBackup="true"
@@ -8,9 +8,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:name=".DaggerTrackApp"
+        android:name="me.amanjeet.daggertrack.DaggerTrackApp"
         android:theme="@style/Theme.DaggerTrack">
-        <activity android:name=".ui.HomeActivity">
+        <activity android:name="me.amanjeet.daggertrack.ui.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -4,9 +4,9 @@ A gradle plugin that automatically adds clock tracking for your components and s
 For example, for `HomeFragment` doing calling inject method you will see following output in your logcat at runtime:
 
 ```
-D/DaggerTrack: Total time of com.droidsingh.daggertrack.ui.HomeFragment: 10420ms
-D/DaggerTrack: Total On CPU time of com.droidsingh.daggertrack.ui.HomeFragment: 4230ms
-D/DaggerTrack: Total Off CPU time of com.droidsingh.daggertrack.ui.HomeFragment: 6190ms
+D/DaggerTrack: Total time of me.amanjeet.daggertrack.ui.HomeFragment: 10420ms
+D/DaggerTrack: Total On CPU time of me.amanjeet.daggertrack.ui.HomeFragment: 4230ms
+D/DaggerTrack: Total Off CPU time of me.amanjeet.daggertrack.ui.HomeFragment: 6190ms
 ```
 DaggerTrack automatically filters the components and their subcomponents and adds clock tracking to `.class` files so that you can see logs in logcat at runtime whenever `inject` is called. 
 
