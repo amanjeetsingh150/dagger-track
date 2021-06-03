@@ -44,5 +44,6 @@ markdown_extensions:
 
 nav:
   - 'Overview': index.md
+  - 'UseCase': usecase.md
 
 
