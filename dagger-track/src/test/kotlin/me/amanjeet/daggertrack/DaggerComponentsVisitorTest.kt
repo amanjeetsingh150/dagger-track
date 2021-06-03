@@ -68,9 +68,9 @@ internal class DaggerComponentsVisitorTest {
                     """
                         long endTime = me.amanjeet.daggertrack.DaggerTrackClocks.getUptimeMillis();
                         long endCpuTime = me.amanjeet.daggertrack.DaggerTrackClocks.getCpuTimeMillis();
-                        android.util.Log.d("DaggerTrack","Total time of ${injectParam}: " + (endTime - initialTime));
-                        android.util.Log.d("DaggerTrack","Total On CPU time of ${injectParam}: " + (endCpuTime - initialCpuTime));
-                        android.util.Log.d("DaggerTrack","Total Off CPU time of ${injectParam}: " + ((endTime - initialTime) - (endCpuTime - initialCpuTime)));
+                        android.util.Log.d("DaggerTrack","Total time of ${injectParam}: " + (endTime - initialTime) + "ms");
+                        android.util.Log.d("DaggerTrack","Total On CPU time of ${injectParam}: " + (endCpuTime - initialCpuTime) + "ms");
+                        android.util.Log.d("DaggerTrack","Total Off CPU time of ${injectParam}: " + ((endTime - initialTime) - (endCpuTime - initialCpuTime)) + "ms");
             """.trimIndent()
                 )
             }

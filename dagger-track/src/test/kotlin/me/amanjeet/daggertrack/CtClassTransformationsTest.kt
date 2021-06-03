@@ -17,7 +17,7 @@ internal class CtClassTransformationsTest {
     fun `it filters out dagger components`() {
         // given
         classPool.makeClass("android.app.Application")
-        classPool.makeClass("com.developers.dranzer.app.DranzerApp")
+        classPool.makeClass("me.amanjeet.daggertrack.DaggerTrackApp")
         classPool.makeClass("dagger.BindsInstance")
         classPool.makeClass("dagger.Component")
         classPool.makeClass("javax.inject.Singleton")
