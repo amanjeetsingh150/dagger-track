@@ -26,7 +26,7 @@ buildscript {
        }
 	}
 	dependencies {
-		classpath "me.amanjeet.daggertrack:dagger-track:1.0.0-SNAPSHOT"
+		classpath "me.amanjeet.daggertrack:dagger-track:1.0.5-SNAPSHOT"
 	}
 }
 ```
@@ -61,7 +61,7 @@ daggerTrack {
 Integrate the `dagger-track-clocks` library in your app `build.gradle`, necessary for providing the different clocks during logging:
 
 ```
-implementation 'me.amanjeet.daggertrack:dagger-track-clocks:1.0.0-SNAPSHOT'
+implementation 'me.amanjeet.daggertrack:dagger-track-clocks:1.0.5-SNAPSHOT'
 ```
 
 Sync your project and voila ✅ you are ready for tracking.
