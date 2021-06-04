@@ -1,6 +1,12 @@
 # ⏰  Dagger Track
 A gradle plugin that automatically adds clock tracking for your components and subcomponents.
 
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/12881364/120842342-3331ea00-c58a-11eb-8ec1-c1729360a6c6.gif?raw=true" width="95%">
+</p>
+
+
 ## Features
 DaggerTrack will tell you following type of time for each of your component and subcomponent injection:
 
