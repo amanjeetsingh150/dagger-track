@@ -359,11 +359,15 @@
                 <h1 id="dagger-track">⏰ Dagger Track<a class="headerlink" href="#dagger-track" title="Permanent link">&para;</a></h1>
 <p>A gradle plugin that automatically adds clock tracking for your components and subcomponents.</p>
 <p>For example, for <code>HomeFragment</code> calling inject method you will see following output in your logcat at runtime:</p>
-<p><div class="highlight"><pre><span></span><code>D/DaggerTrack: Total time of me.amanjeet.daggertrack.ui.HomeFragment: 10420ms
+<div class="highlight"><pre><span></span><code>D/DaggerTrack: Total time of me.amanjeet.daggertrack.ui.HomeFragment: 10420ms
 D/DaggerTrack: Total On CPU time of me.amanjeet.daggertrack.ui.HomeFragment: 4230ms
 D/DaggerTrack: Total Off CPU time of me.amanjeet.daggertrack.ui.HomeFragment: 6190ms
 </code></pre></div>
-DaggerTrack automatically filters the components and their subcomponents and adds tracking logs to <code>.class</code> files so that you can see them in logcat at runtime whenever <code>inject</code> is called.</p>
+<div class="admonition tip">
+<p class="admonition-title">Pro tip</p>
+<p>You can filter your logcat with  <code>adb logcat -s DaggerTrack</code></p>
+</div>
+<p>DaggerTrack automatically filters the components and their subcomponents and adds tracking logs to <code>.class</code> files so that you can see them in logcat at runtime whenever <code>inject</code> is called.</p>
 <h2 id="installation-guide">Installation Guide<a class="headerlink" href="#installation-guide" title="Permanent link">&para;</a></h2>
 <p>Dagger Track is distributed via maven central. Dagger Track requires Gradle 6.0 or higher.</p>
 <p>You can find the snapshots of development version in following sonatype. Include the following in your <code>build.gradle</code>.</p>
