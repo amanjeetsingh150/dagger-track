@@ -27,7 +27,7 @@ Let's say you want to track the different type of times (wall clock, on CPU and 
 
 4. For dagger track sample app following is the generated graph:
 
-<img src="/images/dagger_track_graph.png"/>
+<img src="../images/dagger_track_graph.png" width = "900" align="center"/>
 
 !!! Note
     The python script runs on Python3 and needs **graphviz** module to plot graphs. You can run `pip3 install -r requirements.txt` to install all dependencies.
