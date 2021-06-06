@@ -13,19 +13,19 @@
         <meta name="author" content="Amanjeet Singh">
       
       
-      <link rel="icon" href="/images/slack_logo_small.png">
+      <link rel="icon" href="../images/slack_logo_small.png">
       <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.6">
     
     
       
-        <title>DaggerTrack</title>
+        <title>Example - DaggerTrack</title>
       
     
     
-      <link rel="stylesheet" href="/assets/stylesheets/main.875de78c.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.875de78c.min.css">
       
         
-        <link rel="stylesheet" href="/assets/stylesheets/palette.f1a3b89f.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.f1a3b89f.min.css">
         
           
           
@@ -44,7 +44,7 @@
     
     
     
-      <link rel="stylesheet" href="/css/app.css">
+      <link rel="stylesheet" href="../css/app.css">
     
     
       
@@ -61,7 +61,7 @@
     <body dir="ltr" data-md-color-scheme="" data-md-color-primary="white" data-md-color-accent="white">
   
     
-    <script>function __prefix(e){return new URL("/",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -75,9 +75,9 @@
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="/." title="DaggerTrack" class="md-header__button md-logo" aria-label="DaggerTrack" data-md-component="logo">
+    <a href=".." title="DaggerTrack" class="md-header__button md-logo" aria-label="DaggerTrack" data-md-component="logo">
       
-  <img src="/images/clock.png" alt="logo">
+  <img src="../images/clock.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -93,7 +93,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              Example
             
           </span>
         </div>
@@ -167,9 +167,9 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/." title="DaggerTrack" class="md-nav__button md-logo" aria-label="DaggerTrack" data-md-component="logo">
+    <a href=".." title="DaggerTrack" class="md-nav__button md-logo" aria-label="DaggerTrack" data-md-component="logo">
       
-  <img src="/images/clock.png" alt="logo">
+  <img src="../images/clock.png" alt="logo">
 
     </a>
     DaggerTrack
@@ -198,7 +198,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         Overview
       </a>
     </li>
@@ -213,7 +213,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/usecase/" class="md-nav__link">
+      <a href="../usecase/" class="md-nav__link">
         UseCase
       </a>
     </li>
@@ -226,11 +226,19 @@
 
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="/example/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Example
       </a>
+      
     </li>
   
 
@@ -246,7 +254,54 @@
           <div class="md-content" data-md-component="content">
             <article class="md-content__inner md-typeset">
               
-  <h1>404 - Not found</h1>
+                
+                  <a href="https://github.com/amanjeetsingh150/dagger-track/edit/master/docs/example.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  <h1>Example</h1>
+                
+                <p>Let&rsquo;s say you want to track the different type of times (wall clock, on CPU and off CPU time)  for the dependency injection involved in one of your cold start flows. Following are the steps you should follow:</p>
+<ol>
+<li>
+<p>Set the <code>android:exported</code> flag to true in your <code>AndroidManifest.xml</code> for the activity you want to test.</p>
+</li>
+<li>
+<p>Go the scripts directory in project. Run the following command to get the dependency graph involved for activity involved in cold start:</p>
+<div class="highlight"><pre><span></span><code>./get_injection_time.sh -p &lt;package-name&gt; -c &lt;activity-component-name&gt;
+</code></pre></div>
+<p>where,<br> 
+  <strong>-p</strong> : package name of the application <br>
+  <strong>-c</strong> : component name of activity.</p>
+<p>So, for the sample app the command would be,</p>
+<div class="highlight"><pre><span></span><code>./get_injection_time.sh -p me.amanjeet.daggertrack -c me.amanjeet.daggertrack/me.amanjeet.daggertrack.ui.HomeActivity
+</code></pre></div>
+</li>
+<li>
+<p>This command do following things:</p>
+<ul>
+<li>Clear the logcat</li>
+<li>Kills the app if present in background or foreground</li>
+<li>Launches the activity you passed and wait till it launches fully</li>
+<li>Extracts the logs having the <code>DaggerTrack</code>debug filter</li>
+<li>Runs a python script which is responsible for generating the graph with nodes as different components involved and their respective times.</li>
+</ul>
+</li>
+<li>
+<p>For dagger track sample app following is the generated graph:</p>
+</li>
+</ol>
+<p><img src="/images/dagger_track_graph.png"/></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The python script runs on Python3 and needs <strong>graphviz</strong> module to plot graphs. You can run <code>pip3 install -r requirements.txt</code> to install all dependencies.</p>
+</div>
+                
+              
+              
+                
+
 
               
             </article>
@@ -257,6 +312,25 @@
       
         
 <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        <a href="../usecase/" class="md-footer__link md-footer__link--prev" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              UseCase
+            </div>
+          </div>
+        </a>
+      
+      
+    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
@@ -281,10 +355,10 @@
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "/", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "/assets/javascripts/workers/search.d351de03.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.d351de03.min.js", "version": null}</script>
     
     
-      <script src="/assets/javascripts/bundle.34eae1b6.min.js"></script>
+      <script src="../assets/javascripts/bundle.34eae1b6.min.js"></script>
       
     
   </body>
