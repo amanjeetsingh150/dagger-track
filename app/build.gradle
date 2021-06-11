@@ -3,6 +3,7 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-android-extensions'
     id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
     id 'me.amanjeet.daggertrack'
 }
 
@@ -46,6 +47,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'com.google.dagger:dagger-android-support:2.35.1'
+    implementation "com.google.dagger:hilt-android:2.35"
+    kapt "com.google.dagger:hilt-android-compiler:2.35"
     implementation 'me.amanjeet.daggertrack:dagger-track-clocks:1.0.5-SNAPSHOT'
     kapt 'com.google.dagger:dagger-android-processor:2.35.1'
     kapt 'com.google.dagger:dagger-compiler:2.35.1'
