@@ -6,9 +6,9 @@ import com.android.build.api.transform.Transform
 import com.android.build.api.transform.TransformInvocation
 import com.android.build.gradle.BaseExtension
 import javassist.ClassPool
-import javassist.CtClass
 import javassist.NotFoundException
 import me.amanjeet.daggertrack.DaggerTrackPlugin.DaggerTrackExtension
+import me.amanjeet.daggertrack.transform.DaggerAndroidClassTransform
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 
@@ -52,7 +52,7 @@ internal class DaggerTrackTransform(
         )
         transformInvocation.outputProvider.deleteAll()
         val defaultClassPool = ClassPool.getDefault()
-        val classPoolFactory = me.amanjeet.daggertrack.ClassPoolFactory(defaultClassPool)
+        val classPoolFactory = ClassPoolFactory(defaultClassPool)
         val classPool = classPoolFactory.buildProjectClassPool(
             transformInvocation,
             android
@@ -61,18 +61,12 @@ internal class DaggerTrackTransform(
             variantName.endsWith(it, true)
         } != null
         val allCtClasses = classPool.mapToCtClassList(transformInvocation)
-        val daggerComponentCtClasses = mutableListOf<CtClass>()
         if (shouldApplyTransform) {
             validateDaggerClocks(classPool)
-            daggerComponentCtClasses += allCtClasses.filterDaggerComponents()
-            val daggerComponentsVisitor = DaggerComponentsVisitorImpl()
-            daggerComponentCtClasses.forEach {
-                daggerComponentsVisitor.visit(it)
-            }
-            daggerComponentCtClasses.copyCtClasses(outputDir.canonicalPath)
+            val daggerAndroidClassTransform = DaggerAndroidClassTransform()
+            daggerAndroidClassTransform.handleClassTransformation(allCtClasses, outputDir)
         }
         copyAllJars(transformInvocation)
-        (allCtClasses - daggerComponentCtClasses).copyCtClasses(outputDir.canonicalPath)
     }
 
     private fun validateDaggerClocks(classPool: ClassPool) {
