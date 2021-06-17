@@ -5,6 +5,15 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import javassist.ClassPool
 import javassist.CtClass
+import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator
+import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.ACTIVITY_C_IMPL
+import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.ACTIVITY_RETAINED_C_IMPL
+import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.FRAGMENT_C_IMPL
+import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.SERVICE_C_IMPL
+import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.SINGLETON_C_IMPL
+import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.VIEWMODEL_C_IMPL
+import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.VIEW_C_IMPL
+import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.VIEW_WITH_FRAGMENT_C_IMPL
 import me.amanjeet.daggertrack.utils.addSubcomponentAnnotation
 import org.junit.Test
 import java.io.File
@@ -12,12 +21,11 @@ import java.io.File
 internal class CtClassTransformationsTest {
 
     private val classPool = ClassPool.getDefault()
+    private val applicationClass = classPool.makeClass("android.app.Application")
 
     @Test
     fun `it filters out dagger components`() {
         // given
-        classPool.makeClass("android.app.Application")
-        classPool.makeClass("me.amanjeet.daggertrack.DaggerTrackApp")
         classPool.makeClass("dagger.BindsInstance")
         classPool.makeClass("dagger.Component")
         classPool.makeClass("javax.inject.Singleton")
@@ -81,6 +89,36 @@ internal class CtClassTransformationsTest {
         val subcomponentListNames = subComponentCtClassList.map { it.name }
         assertThat(subcomponentListNames).containsExactly(
             homeActivitySubcomponentImpl.name, homeFragmentNestedSubcomponentImpl.name
+        )
+    }
+
+    @Test
+    fun `it filters out all the dagger hilt components`() {
+        // given
+        val hiltDaggerApp = classPool.makeClass("me.amanjeet.daggertrack.Hilt_DaggerTrackApp")
+        hiltDaggerApp.superclass = applicationClass
+        val singletonRootC = DaggerComponentsFixtureCreator().createHiltComponentTree()
+        val homeActivity = mock<CtClass>()
+        val homePresenter = mock<CtClass>()
+        val ctClassList = listOf(
+            hiltDaggerApp, singletonRootC,
+            homeActivity, homePresenter
+        )
+
+        // when
+        val hiltComponents = ctClassList.filterDaggerHiltComponents()
+
+        // then
+        val hiltComponentNames = hiltComponents.map { it.name }
+        assertThat(hiltComponentNames).containsExactly(
+            SINGLETON_C_IMPL,
+            SERVICE_C_IMPL,
+            ACTIVITY_RETAINED_C_IMPL,
+            VIEWMODEL_C_IMPL,
+            ACTIVITY_C_IMPL,
+            VIEW_C_IMPL,
+            VIEW_WITH_FRAGMENT_C_IMPL,
+            FRAGMENT_C_IMPL
         )
     }
 
