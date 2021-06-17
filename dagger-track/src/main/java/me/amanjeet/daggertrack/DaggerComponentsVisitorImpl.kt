@@ -3,10 +3,6 @@ package me.amanjeet.daggertrack
 import javassist.CtClass
 import javassist.CtMethod
 
-internal interface DaggerComponentsVisitor {
-    fun visit(daggerComponent: CtClass)
-}
-
 /**
  * Visits dagger components and subcomponents to add clock logs.
  */
@@ -30,9 +26,9 @@ internal class DaggerComponentsVisitorImpl : DaggerComponentsVisitor {
         injectMethod.addLocalVariable("initialCpuTime", CtClass.longType)
         injectMethod.insertBefore(
             """
-                    long initialTime = me.amanjeet.daggertrack.DaggerTrackClocks.getUptimeMillis();
-                    long initialCpuTime = me.amanjeet.daggertrack.DaggerTrackClocks.getCpuTimeMillis();
-                """.trimIndent()
+                long initialTime = me.amanjeet.daggertrack.DaggerTrackClocks.getUptimeMillis();
+                long initialCpuTime = me.amanjeet.daggertrack.DaggerTrackClocks.getCpuTimeMillis();
+            """.trimIndent()
         )
         injectMethod.addLocalVariable("endTime", CtClass.longType)
         injectMethod.addLocalVariable("endCpuTime", CtClass.longType)
