@@ -2,6 +2,7 @@ package me.amanjeet.daggertrack
 
 import javassist.CtClass
 import javassist.CtMethod
+import java.lang.reflect.Modifier
 
 /**
  * Visits dagger components and subcomponents to add clock logs.
@@ -9,18 +10,25 @@ import javassist.CtMethod
 internal class DaggerComponentsVisitorImpl : DaggerComponentsVisitor {
 
     override fun visitDaggerAndroidComponents(daggerComponent: CtClass) {
-        setComponentTracking(daggerComponent)
+        val methodPredicate: (ctMethod: CtMethod) -> Boolean = { it.name == "inject" }
+        setComponentTracking(daggerComponent, methodPredicate)
         daggerComponent.filterSubcomponents()
-            .forEach { setComponentTracking(it) }
+            .forEach { setComponentTracking(it, methodPredicate) }
     }
 
     override fun visitDaggerHiltComponents(daggerComponent: CtClass) {
-        TODO()
+        val methodPredicate: (ctMethod: CtMethod) -> Boolean = {
+            it.name.contains("inject") && it.modifiers == Modifier.PUBLIC
+        }
+        setComponentTracking(daggerComponent, methodPredicate)
     }
 
-    private fun setComponentTracking(component: CtClass) {
+    private fun setComponentTracking(
+        component: CtClass,
+        methodPredicate: (ctMethod: CtMethod) -> Boolean
+    ) {
         defrostCtClass(component)
-        component.declaredMethods.filter { it.name == "inject" }.forEach { injectMethod ->
+        component.declaredMethods.filter { methodPredicate(it) }.forEach { injectMethod ->
             val injectParam = injectMethod.parameterTypes.first().name
             setTrackingLogs(injectMethod, injectParam)
         }
