@@ -13,7 +13,7 @@ internal class DaggerAndroidClassTransform : DaggerTrackClassTransform {
         daggerComponentCtClasses += allCtClasses.filterDaggerComponents()
         val daggerComponentsVisitor = DaggerComponentsVisitorImpl()
         daggerComponentCtClasses.forEach {
-            daggerComponentsVisitor.visit(it)
+            daggerComponentsVisitor.visitDaggerAndroidComponents(it)
         }
         daggerComponentCtClasses.copyCtClasses(outputDir.canonicalPath)
         (allCtClasses - daggerComponentCtClasses).copyCtClasses(outputDir.canonicalPath)

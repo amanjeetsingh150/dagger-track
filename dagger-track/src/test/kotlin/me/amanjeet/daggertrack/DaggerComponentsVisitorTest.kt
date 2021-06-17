@@ -47,7 +47,7 @@ internal class DaggerComponentsVisitorTest {
     fun `it visits the components and their subcomponents and add tracking logs on inject`() {
         // when
         val daggerComponentsVisitor = DaggerComponentsVisitorImpl()
-        daggerComponentsVisitor.visit(applicationComponent)
+        daggerComponentsVisitor.visitDaggerAndroidComponents(applicationComponent)
 
         // then
         arrayOf(applicationComponent, activitySubcomponentImpl, fragmentSubcomponentImpl)
@@ -85,7 +85,7 @@ internal class DaggerComponentsVisitorTest {
 
         // when
         val daggerComponentsVisitor = DaggerComponentsVisitorImpl()
-        daggerComponentsVisitor.visit(applicationComponent)
+        daggerComponentsVisitor.visitDaggerAndroidComponents(applicationComponent)
 
         // then
         verify(applicationComponent).defrost()

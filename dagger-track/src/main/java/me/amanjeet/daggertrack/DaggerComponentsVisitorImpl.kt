@@ -7,10 +7,15 @@ import javassist.CtMethod
  * Visits dagger components and subcomponents to add clock logs.
  */
 internal class DaggerComponentsVisitorImpl : DaggerComponentsVisitor {
-    override fun visit(daggerComponent: CtClass) {
+
+    override fun visitDaggerAndroidComponents(daggerComponent: CtClass) {
         setComponentTracking(daggerComponent)
         daggerComponent.filterSubcomponents()
             .forEach { setComponentTracking(it) }
+    }
+
+    override fun visitDaggerHiltComponents(daggerComponent: CtClass) {
+        TODO()
     }
 
     private fun setComponentTracking(component: CtClass) {
