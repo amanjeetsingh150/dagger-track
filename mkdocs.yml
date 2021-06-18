@@ -35,6 +35,7 @@ markdown_extensions:
   - pymdownx.caret
   - pymdownx.inlinehilite
   - pymdownx.magiclink
+  - pymdownx.tabbed
   - pymdownx.smartsymbols
   - pymdownx.superfences
   - pymdownx.emoji

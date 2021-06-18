@@ -20,31 +20,55 @@ Dagger Track is distributed via maven central. Dagger Track requires Gradle 6.0 
 
 You can find the snapshots of development version in following sonatype. Include the following in your `build.gradle`.
 
-```
-buildscript {
-	repositories {
-	 	mavenCentral()
-    	google()
-		maven {
-            url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-       }
-	}
-	dependencies {
-		classpath "me.amanjeet.daggertrack:dagger-track:1.0.5-SNAPSHOT"
-	}
-}
-```
+=== "Groovy"
+    ```
+    buildscript {
+        repositories {
+            mavenCentral()
+            google()
+            maven {
+                url 'https://s01.oss.sonatype.org/content/repositories/snapshots'
+            }
+        }
+        dependencies {
+            classpath "me.amanjeet.daggertrack:dagger-track:1.0.6-SNAPSHOT"
+        }
+    }
+    ```
+=== "Kotlin"
+    ```
+    buildscript {
+        repositories {
+            mavenCentral()
+            google()
+            maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
+        }
+        dependencies {
+            classpath("me.amanjeet.daggertrack:dagger-track:1.0.6-SNAPSHOT")
+        }
+    }
+    ```
+    
 
 In your app level `build.gradle` apply the plugin:
 
 If you use plugin DSL:
 
-```
-plugins {
-	id 'com.android.application' <---- Only works with android application & library 
-	id 'me.amanjeet.daggertrack'
-}
-```
+=== "Groovy"
+    ```
+    plugins {
+        id 'com.android.application' <---- Only works with android application & library 
+        id 'me.amanjeet.daggertrack'
+    }
+    ```
+=== "Kotlin"
+    ```
+    plugins {
+        id("com.android.application") <---- Only works with android application & library 
+        id("me.amanjeet.daggertrack")
+    }
+    ```
+    
 
 or if you are using older versions of Gradle:
 
@@ -57,16 +81,29 @@ Note that DaggeTrack must be applied after the Android gradle plugin.
 
 You need to tell dagger track which variant it should run on:
 
-```
-daggerTrack {
-    applyFor = ["debug"]
-}
-```
+=== "Groovy"
+    ```
+    daggerTrack {
+        applyFor = ["debug"]
+    }
+    ```
+=== "Kotlin"
+    ```
+    daggerTrack {
+        applyFor = arrayOf("debug")
+    }
+    ```    
+    
 Integrate the `dagger-track-clocks` library in your app `build.gradle`, necessary for providing the different clocks during logging:
 
-```
-implementation 'me.amanjeet.daggertrack:dagger-track-clocks:1.0.5-SNAPSHOT'
-```
+=== "Groovy"
+    ```
+    implementation 'me.amanjeet.daggertrack:dagger-track-clocks:1.0.6-SNAPSHOT'
+    ```
+=== "Kotlin"
+    ```
+    implementation("me.amanjeet.daggertrack:dagger-track-clocks:1.0.6-SNAPSHOT")
+    ```        
 
 Sync your project and voila ✅ you are ready for tracking.
  
