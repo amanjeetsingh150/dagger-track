@@ -386,39 +386,81 @@ D/DaggerTrack: Total Off CPU time of me.amanjeet.daggertrack.ui.HomeFragment: 61
 <h2 id="installation-guide">Installation Guide<a class="headerlink" href="#installation-guide" title="Permanent link">&para;</a></h2>
 <p>Dagger Track is distributed via maven central. Dagger Track requires Gradle 6.0 or higher.</p>
 <p>You can find the snapshots of development version in following sonatype. Include the following in your <code>build.gradle</code>.</p>
+<div class="tabbed-set" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">Groovy</label><div class="tabbed-content">
 <div class="highlight"><pre><span></span><code>buildscript {
     repositories {
         mavenCentral()
         google()
         maven {
-            url &#39;https://s01.oss.sonatype.org/content/repositories/snapshots/&#39;
-       }
+            url &#39;https://s01.oss.sonatype.org/content/repositories/snapshots&#39;
+        }
     }
     dependencies {
-        classpath &quot;me.amanjeet.daggertrack:dagger-track:1.0.5-SNAPSHOT&quot;
+        classpath &quot;me.amanjeet.daggertrack:dagger-track:1.0.6-SNAPSHOT&quot;
     }
 }
 </code></pre></div>
+</div>
+<input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><label for="__tabbed_1_2">Kotlin</label><div class="tabbed-content">
+<div class="highlight"><pre><span></span><code>buildscript {
+    repositories {
+        mavenCentral()
+        google()
+        maven(&quot;https://s01.oss.sonatype.org/content/repositories/snapshots&quot;)
+    }
+    dependencies {
+        classpath(&quot;me.amanjeet.daggertrack:dagger-track:1.0.6-SNAPSHOT&quot;)
+    }
+}
+</code></pre></div>
+</div>
+</div>
 <p>In your app level <code>build.gradle</code> apply the plugin:</p>
 <p>If you use plugin DSL:</p>
+<div class="tabbed-set" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><label for="__tabbed_2_1">Groovy</label><div class="tabbed-content">
 <div class="highlight"><pre><span></span><code>plugins {
     id &#39;com.android.application&#39; &lt;---- Only works with android application &amp; library 
     id &#39;me.amanjeet.daggertrack&#39;
 }
 </code></pre></div>
+</div>
+<input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><label for="__tabbed_2_2">Kotlin</label><div class="tabbed-content">
+<div class="highlight"><pre><span></span><code>plugins {
+    id(&quot;com.android.application&quot;) &lt;---- Only works with android application &amp; library 
+    id(&quot;me.amanjeet.daggertrack&quot;)
+}
+</code></pre></div>
+</div>
+</div>
 <p>or if you are using older versions of Gradle:</p>
 <p><div class="highlight"><pre><span></span><code>apply plugin: &#39;com.android.application&#39; &lt;---- Only works with android application &amp; library 
 apply plugin: &#39;me.amanjeet.daggertrack&#39;
 </code></pre></div>
 Note that DaggeTrack must be applied after the Android gradle plugin.</p>
 <p>You need to tell dagger track which variant it should run on:</p>
-<p><div class="highlight"><pre><span></span><code>daggerTrack {
+<div class="tabbed-set" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><label for="__tabbed_3_1">Groovy</label><div class="tabbed-content">
+<div class="highlight"><pre><span></span><code>daggerTrack {
     applyFor = [&quot;debug&quot;]
 }
 </code></pre></div>
-Integrate the <code>dagger-track-clocks</code> library in your app <code>build.gradle</code>, necessary for providing the different clocks during logging:</p>
-<div class="highlight"><pre><span></span><code>implementation &#39;me.amanjeet.daggertrack:dagger-track-clocks:1.0.5-SNAPSHOT&#39;
+</div>
+<input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><label for="__tabbed_3_2">Kotlin</label><div class="tabbed-content">
+<div class="highlight"><pre><span></span><code>daggerTrack {
+    applyFor = arrayOf(&quot;debug&quot;)
+}
 </code></pre></div>
+</div>
+</div>
+<p>Integrate the <code>dagger-track-clocks</code> library in your app <code>build.gradle</code>, necessary for providing the different clocks during logging:</p>
+<div class="tabbed-set" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><label for="__tabbed_4_1">Groovy</label><div class="tabbed-content">
+<div class="highlight"><pre><span></span><code>implementation &#39;me.amanjeet.daggertrack:dagger-track-clocks:1.0.6-SNAPSHOT&#39;
+</code></pre></div>
+</div>
+<input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><label for="__tabbed_4_2">Kotlin</label><div class="tabbed-content">
+<div class="highlight"><pre><span></span><code>implementation(&quot;me.amanjeet.daggertrack:dagger-track-clocks:1.0.6-SNAPSHOT&quot;)
+</code></pre></div>
+</div>
+</div>
 <p>Sync your project and voila ✅ you are ready for tracking.</p>
 <h2 id="internal-working">Internal Working<a class="headerlink" href="#internal-working" title="Permanent link">&para;</a></h2>
 <ol>
