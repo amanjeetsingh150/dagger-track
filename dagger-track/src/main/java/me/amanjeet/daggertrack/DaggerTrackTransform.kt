@@ -9,11 +9,12 @@ import javassist.ClassPool
 import javassist.NotFoundException
 import me.amanjeet.daggertrack.DaggerTrackPlugin.DaggerTrackExtension
 import me.amanjeet.daggertrack.transform.DaggerAndroidClassTransform
+import me.amanjeet.daggertrack.transform.DaggerHiltClassTransform
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 
 internal class DaggerTrackTransform(
-    project: Project,
+    private val project: Project,
     private val android: BaseExtension,
     private val daggerTrackExtension: DaggerTrackExtension
 ) : Transform() {
@@ -22,6 +23,7 @@ internal class DaggerTrackTransform(
 
     companion object {
         private const val TRANSFORM_NAME = "DAGGER_TRACK"
+        private const val DAGGER_HILT_PLUGIN = "dagger.hilt.android.plugin"
     }
 
     override fun getName() = TRANSFORM_NAME
@@ -63,8 +65,14 @@ internal class DaggerTrackTransform(
         val allCtClasses = classPool.mapToCtClassList(transformInvocation)
         if (shouldApplyTransform) {
             validateDaggerClocks(classPool)
-            val daggerAndroidClassTransform = DaggerAndroidClassTransform()
-            daggerAndroidClassTransform.handleClassTransformation(allCtClasses, outputDir)
+            val isDaggerHiltProject = isDaggerHiltProject()
+            if (isDaggerHiltProject) {
+                val daggerHiltClassTransform = DaggerHiltClassTransform()
+                daggerHiltClassTransform.handleClassTransformation(allCtClasses, outputDir)
+            } else {
+                val daggerAndroidClassTransform = DaggerAndroidClassTransform()
+                daggerAndroidClassTransform.handleClassTransformation(allCtClasses, outputDir)
+            }
         }
         copyAllJars(transformInvocation)
     }
@@ -75,5 +83,9 @@ internal class DaggerTrackTransform(
         } catch (notFoundException: NotFoundException) {
             throw GradleException("\"dagger-track-clocks\" dependency needed for dagger-track plugin")
         }
+    }
+
+    private fun isDaggerHiltProject(): Boolean {
+        return project.plugins.hasPlugin(DAGGER_HILT_PLUGIN)
     }
 }
