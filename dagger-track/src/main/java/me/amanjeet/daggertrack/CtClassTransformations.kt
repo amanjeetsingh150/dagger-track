@@ -1,6 +1,8 @@
 package me.amanjeet.daggertrack
 
 import javassist.CtClass
+import me.amanjeet.daggertrack.models.HiltComponent
+import java.util.*
 
 /**
  * Filters a list of [CtClass] to give dagger components
@@ -31,4 +33,53 @@ private fun CtClass.filterNestedSubcomponents(): List<CtClass> {
         }
         subcomponentInterface.isNotEmpty()
     }
+}
+
+/**
+ * Filters dagger hilt components from the generated singleton hilt component. Traverses through
+ * the nested classes for each hilt component and adds all the component in hierarchy to a list.
+ *
+ * @return list of [CtClass] representing dagger hilt components
+ */
+fun List<CtClass>.filterDaggerHiltComponents(): List<CtClass> {
+    val componentList = mutableListOf<CtClass>()
+    val generatedApplicationClass = first {
+        it.superclass.name == "android.app.Application"
+    }
+    val queue = LinkedList<HiltComponent>()
+    queue.add(HiltComponent.SingletonComponent)
+    val singletonComponentClass = first {
+        it.superclass.name == getGeneratedComponentName(
+            generatedApplicationClass,
+            HiltComponent.SingletonComponent
+        )
+    }
+    componentList += singletonComponentClass
+    while (!queue.isEmpty()) {
+        val hiltComponent = queue.poll()
+        val componentClass = componentList.first { it.name.contains(hiltComponent.componentName) }
+        if (hiltComponent.getChildComponents().isNotEmpty()) {
+            hiltComponent.getChildComponents().forEach { component ->
+                val childComponents = componentClass.nestedClasses.filter {
+                    it.superclass.name == getGeneratedComponentName(
+                        generatedApplicationClass,
+                        component
+                    )
+                }
+                componentList += childComponents
+                queue.add(component)
+            }
+        }
+    }
+    return componentList.toList()
+}
+
+private fun getGeneratedComponentName(
+    generatedApplicationClass: CtClass?,
+    hiltComponentName: HiltComponent
+): String {
+    val applicationClass = generatedApplicationClass?.name?.replace(
+        "Hilt_", ""
+    )
+    return applicationClass + "_HiltComponents$" + hiltComponentName.componentName
 }

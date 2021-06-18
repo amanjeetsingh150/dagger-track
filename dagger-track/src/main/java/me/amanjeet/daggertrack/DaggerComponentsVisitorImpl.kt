@@ -2,24 +2,33 @@ package me.amanjeet.daggertrack
 
 import javassist.CtClass
 import javassist.CtMethod
-
-internal interface DaggerComponentsVisitor {
-    fun visit(daggerComponent: CtClass)
-}
+import java.lang.reflect.Modifier
 
 /**
  * Visits dagger components and subcomponents to add clock logs.
  */
 internal class DaggerComponentsVisitorImpl : DaggerComponentsVisitor {
-    override fun visit(daggerComponent: CtClass) {
-        setComponentTracking(daggerComponent)
+
+    override fun visitDaggerAndroidComponents(daggerComponent: CtClass) {
+        val methodPredicate: (ctMethod: CtMethod) -> Boolean = { it.name == "inject" }
+        setComponentTracking(daggerComponent, methodPredicate)
         daggerComponent.filterSubcomponents()
-            .forEach { setComponentTracking(it) }
+            .forEach { setComponentTracking(it, methodPredicate) }
     }
 
-    private fun setComponentTracking(component: CtClass) {
+    override fun visitDaggerHiltComponents(daggerComponent: CtClass) {
+        val methodPredicate: (ctMethod: CtMethod) -> Boolean = {
+            it.name.contains("inject") && it.modifiers == Modifier.PUBLIC
+        }
+        setComponentTracking(daggerComponent, methodPredicate)
+    }
+
+    private fun setComponentTracking(
+        component: CtClass,
+        methodPredicate: (ctMethod: CtMethod) -> Boolean
+    ) {
         defrostCtClass(component)
-        component.declaredMethods.filter { it.name == "inject" }.forEach { injectMethod ->
+        component.declaredMethods.filter { methodPredicate(it) }.forEach { injectMethod ->
             val injectParam = injectMethod.parameterTypes.first().name
             setTrackingLogs(injectMethod, injectParam)
         }
@@ -30,9 +39,9 @@ internal class DaggerComponentsVisitorImpl : DaggerComponentsVisitor {
         injectMethod.addLocalVariable("initialCpuTime", CtClass.longType)
         injectMethod.insertBefore(
             """
-                    long initialTime = me.amanjeet.daggertrack.DaggerTrackClocks.getUptimeMillis();
-                    long initialCpuTime = me.amanjeet.daggertrack.DaggerTrackClocks.getCpuTimeMillis();
-                """.trimIndent()
+                long initialTime = me.amanjeet.daggertrack.DaggerTrackClocks.getUptimeMillis();
+                long initialCpuTime = me.amanjeet.daggertrack.DaggerTrackClocks.getCpuTimeMillis();
+            """.trimIndent()
         )
         injectMethod.addLocalVariable("endTime", CtClass.longType)
         injectMethod.addLocalVariable("endCpuTime", CtClass.longType)

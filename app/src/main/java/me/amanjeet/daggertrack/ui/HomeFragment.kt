@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.android.support.AndroidSupportInjection
+import dagger.hilt.InstallIn
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
 import me.amanjeet.daggertrack.HeavyDependencyOne
 import me.amanjeet.daggertrack.HeavyDependencyTwo
@@ -22,6 +24,7 @@ import java.util.regex.Pattern
 import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     @Inject
@@ -29,11 +32,6 @@ class HomeFragment : Fragment() {
 
     @Inject
     lateinit var heavyDependencyTwo: HeavyDependencyTwo
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        AndroidSupportInjection.inject(this)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

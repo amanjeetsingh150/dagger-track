@@ -6,14 +6,15 @@ import com.android.build.api.transform.Transform
 import com.android.build.api.transform.TransformInvocation
 import com.android.build.gradle.BaseExtension
 import javassist.ClassPool
-import javassist.CtClass
 import javassist.NotFoundException
 import me.amanjeet.daggertrack.DaggerTrackPlugin.DaggerTrackExtension
+import me.amanjeet.daggertrack.transform.DaggerAndroidClassTransform
+import me.amanjeet.daggertrack.transform.DaggerHiltClassTransform
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 
 internal class DaggerTrackTransform(
-    project: Project,
+    private val project: Project,
     private val android: BaseExtension,
     private val daggerTrackExtension: DaggerTrackExtension
 ) : Transform() {
@@ -22,6 +23,7 @@ internal class DaggerTrackTransform(
 
     companion object {
         private const val TRANSFORM_NAME = "DAGGER_TRACK"
+        private const val DAGGER_HILT_PLUGIN = "dagger.hilt.android.plugin"
     }
 
     override fun getName() = TRANSFORM_NAME
@@ -52,7 +54,7 @@ internal class DaggerTrackTransform(
         )
         transformInvocation.outputProvider.deleteAll()
         val defaultClassPool = ClassPool.getDefault()
-        val classPoolFactory = me.amanjeet.daggertrack.ClassPoolFactory(defaultClassPool)
+        val classPoolFactory = ClassPoolFactory(defaultClassPool)
         val classPool = classPoolFactory.buildProjectClassPool(
             transformInvocation,
             android
@@ -61,18 +63,18 @@ internal class DaggerTrackTransform(
             variantName.endsWith(it, true)
         } != null
         val allCtClasses = classPool.mapToCtClassList(transformInvocation)
-        val daggerComponentCtClasses = mutableListOf<CtClass>()
         if (shouldApplyTransform) {
             validateDaggerClocks(classPool)
-            daggerComponentCtClasses += allCtClasses.filterDaggerComponents()
-            val daggerComponentsVisitor = DaggerComponentsVisitorImpl()
-            daggerComponentCtClasses.forEach {
-                daggerComponentsVisitor.visit(it)
+            val isDaggerHiltProject = isDaggerHiltProject()
+            if (isDaggerHiltProject) {
+                val daggerHiltClassTransform = DaggerHiltClassTransform()
+                daggerHiltClassTransform.handleClassTransformation(allCtClasses, outputDir)
+            } else {
+                val daggerAndroidClassTransform = DaggerAndroidClassTransform()
+                daggerAndroidClassTransform.handleClassTransformation(allCtClasses, outputDir)
             }
-            daggerComponentCtClasses.copyCtClasses(outputDir.canonicalPath)
         }
         copyAllJars(transformInvocation)
-        (allCtClasses - daggerComponentCtClasses).copyCtClasses(outputDir.canonicalPath)
     }
 
     private fun validateDaggerClocks(classPool: ClassPool) {
@@ -81,5 +83,9 @@ internal class DaggerTrackTransform(
         } catch (notFoundException: NotFoundException) {
             throw GradleException("\"dagger-track-clocks\" dependency needed for dagger-track plugin")
         }
+    }
+
+    private fun isDaggerHiltProject(): Boolean {
+        return project.plugins.hasPlugin(DAGGER_HILT_PLUGIN)
     }
 }
