@@ -61,28 +61,4 @@ internal class ClassPoolFactoryTest {
         verify(classPool).insertClassPath(externalJarPath)
         verify(classPool).insertClassPath(externalClassDirectoryPath)
     }
-
-    @Test
-    fun `it includes project files inputs in class pool`() {
-        // given
-        val jarPath = "/jars/myInternalJar.jar"
-        val directoryPath = "/directory/MyApplicationClass"
-        whenever(jarFile.absolutePath).thenReturn(jarPath)
-        whenever(directoryInputFile.absolutePath).thenReturn(directoryPath)
-        whenever(directoryInput.file).thenReturn(directoryInputFile)
-        whenever(jarInput.file).thenReturn(jarFile)
-        whenever(transformInvocation.inputs).thenReturn(transformInputCollection)
-        whenever(transformInput.directoryInputs).thenReturn(directoryInputCollection)
-        whenever(transformInput.jarInputs).thenReturn(jarInputCollection)
-
-        // when
-        ClassPoolFactory(classPool).buildProjectClassPool(
-            transformInvocation,
-            android
-        )
-
-        // then
-        verify(classPool).insertClassPath(jarPath)
-        verify(classPool).insertClassPath(directoryPath)
-    }
 }

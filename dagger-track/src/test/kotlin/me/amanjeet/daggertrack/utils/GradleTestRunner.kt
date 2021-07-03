@@ -1,9 +1,10 @@
 package me.amanjeet.daggertrack.utils
 
-import java.io.File
+import org.apache.commons.io.FileUtils
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.rules.TemporaryFolder
+import java.io.File
 
 /**
  * Testing utility class that sets up a simple Android project.
@@ -19,7 +20,6 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
     private var buildFile: File? = null
     private var gradlePropertiesFile: File? = null
     private var manifestFile: File? = null
-    private var additionalTasks = mutableListOf<String>()
 
     init {
         tempFolder.newFolder("src", "main", "java", "minimal")
@@ -46,6 +46,16 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
         return tempFolder.newFile("/src/main/java/$srcPath").apply { writeText(srcContent) }
     }
 
+    fun setAppClassName(name: String) {
+        appClassName = name
+    }
+
+    // Executes a Gradle builds and expects it to succeed.
+    fun build(): Result {
+        setupFiles()
+        return Result(tempFolder.root, createRunner().build())
+    }
+
     // Executes a Gradle build and expects it to fail.
     fun buildAndFail(): Result {
         setupFiles()
@@ -53,7 +63,8 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
     }
 
     fun buildAndFailJavaLibrary(): Result {
-        tempFolder.newFile("build.gradle").apply {
+        buildFile?.delete()
+        buildFile = tempFolder.newFile("build.gradle").apply {
             writeText(
                 """
                     | buildscript {
@@ -69,12 +80,12 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
                     |         classpath "me.amanjeet.daggertrack:dagger-track:1.0.6-SNAPSHOT"
                     |     }
                     | }
-                    | 
+                    |
                     | plugins {
                     |     id 'java-library'
                     |     id 'me.amanjeet.daggertrack'
                     | }
-                    | 
+                    |
                 """.trimMargin()
             )
         }
@@ -92,51 +103,54 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
         buildFile = tempFolder.newFile("build.gradle").apply {
             writeText(
                 """
-        buildscript {
-          repositories {
-            google()
-            maven {
-                url 'https://s01.oss.sonatype.org/content/repositories/snapshots'
-            }
-          }
-          dependencies {
-            classpath 'com.android.tools.build:gradle:4.2.0'
-            classpath "me.amanjeet.daggertrack:dagger-track:1.0.6-SNAPSHOT"
-          }
-        }
-        plugins {
-          id 'com.android.application'
-          id 'me.amanjeet.daggertrack'
-        }
-        android {
-          compileSdkVersion 30
-          buildToolsVersion "30.0.2"
-          defaultConfig {
-            applicationId "plugin.test"
-            minSdkVersion 21
-            targetSdkVersion 30
-          }
-          compileOptions {
-              sourceCompatibility 1.8
-              targetCompatibility 1.8
-          }
-          ${additionalAndroidOptions.joinToString(separator = "\n")}
-        }
-        allprojects {
-          repositories {
-            google()
-            maven {
-                url 'https://s01.oss.sonatype.org/content/repositories/snapshots'
-            }
-          }
-        }
-        daggerTrack {
-            applyFor = ["debug"]
-        }
-        dependencies {
-          ${dependencies.joinToString(separator = "\n")}
-        }
-        """.trimIndent()
+                    buildscript {
+                      repositories {
+                        google()
+                        mavenCentral()
+                        maven {
+                            url 'https://s01.oss.sonatype.org/content/repositories/snapshots'
+                        }
+                      }
+                      dependencies {
+                        classpath 'com.android.tools.build:gradle:4.2.0'
+                        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10"
+                        classpath "me.amanjeet.daggertrack:dagger-track:1.0.6-SNAPSHOT"
+                      }
+                    }
+                    plugins {
+                      id 'com.android.application'
+                      id 'me.amanjeet.daggertrack'
+                    }
+                    android {
+                      compileSdkVersion 30
+                      buildToolsVersion "30.0.2"
+                      defaultConfig {
+                        applicationId "plugin.test"
+                        minSdkVersion 21
+                        targetSdkVersion 30
+                      }
+                      compileOptions {
+                          sourceCompatibility 1.8
+                          targetCompatibility 1.8
+                      }
+                      ${additionalAndroidOptions.joinToString(separator = "\n")}
+                    }
+                    allprojects {
+                      repositories {
+                        google()
+                        mavenCentral()
+                        maven {
+                            url 'https://s01.oss.sonatype.org/content/repositories/snapshots'
+                        }
+                      }
+                    }
+                    daggerTrack {
+                        applyFor = ["debug"]
+                    }
+                    dependencies {
+                      ${dependencies.joinToString(separator = "\n")}
+                    }
+                """.trimIndent()
             )
         }
     }
@@ -172,7 +186,7 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
 
     private fun createRunner() = GradleRunner.create()
         .withProjectDir(tempFolder.root)
-        .withArguments(listOf("--stacktrace", "assembleDebug") + additionalTasks)
+        .withArguments(listOf("--stacktrace", "assembleDebug"))
         .withPluginClasspath()
         .forwardOutput()
 
@@ -181,7 +195,21 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
         private val projectRoot: File,
         private val buildResult: BuildResult
     ) {
+        // Finds a task by name.
+        fun getTask(name: String) = buildResult.task(name) ?: error("Task '$name' not found.")
+
         // Gets the full build output.
         fun getOutput(): String = buildResult.output
+
+        // Finds a transformed file. The srcFilePath is relative to the app's package.
+        fun getTransformedFile(srcFilePath: String): File {
+            val parentDir =
+                File(projectRoot, "build/intermediates/transforms/DAGGER_TRACK/debug/0")
+            return File(parentDir, srcFilePath).also {
+                if (!it.exists()) {
+                    error("Unable to find transformed class ${it.path}")
+                }
+            }
+        }
     }
 }
