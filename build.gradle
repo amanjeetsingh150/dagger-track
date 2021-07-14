@@ -12,7 +12,7 @@ buildscript {
         classpath "com.android.tools.build:gradle:4.2.1"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.vanniktech:gradle-maven-publish-plugin:0.15.1'
-        classpath "me.amanjeet.daggertrack:dagger-track:1.0.5-SNAPSHOT"
+        classpath "me.amanjeet.daggertrack:dagger-track:1.0.6-SNAPSHOT"
         classpath "com.google.dagger:hilt-android-gradle-plugin:2.35"
 
         // NOTE: Do not place your application dependencies here; they belong
