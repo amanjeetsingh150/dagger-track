@@ -1,6 +1,5 @@
 package me.amanjeet.daggertrack.utils
 
-import org.apache.commons.io.FileUtils
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.rules.TemporaryFolder
@@ -51,14 +50,14 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
     }
 
     // Executes a Gradle builds and expects it to succeed.
-    fun build(): Result {
-        setupFiles()
+    fun build(shouldIntegrateDaggerTrack: Boolean = true): Result {
+        setupFiles(shouldIntegrateDaggerTrack)
         return Result(tempFolder.root, createRunner().build())
     }
 
     // Executes a Gradle build and expects it to fail.
-    fun buildAndFail(): Result {
-        setupFiles()
+    fun buildAndFail(shouldIntegrateDaggerTrack: Boolean = true): Result {
+        setupFiles(shouldIntegrateDaggerTrack)
         return Result(tempFolder.root, createRunner().buildAndFail())
     }
 
@@ -92,13 +91,13 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
         return Result(tempFolder.root, createRunner().buildAndFail())
     }
 
-    private fun setupFiles() {
-        writeBuildFile()
+    private fun setupFiles(shouldIntegrateDaggerTrack: Boolean) {
+        writeBuildFile(shouldIntegrateDaggerTrack)
         writeGradleProperties()
         writeAndroidManifest()
     }
 
-    private fun writeBuildFile() {
+    private fun writeBuildFile(shouldIntegrateDaggerTrack: Boolean) {
         buildFile?.delete()
         buildFile = tempFolder.newFile("build.gradle").apply {
             writeText(
@@ -114,12 +113,12 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
                       dependencies {
                         classpath 'com.android.tools.build:gradle:4.2.0'
                         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10"
-                        classpath "me.amanjeet.daggertrack:dagger-track:1.0.6-SNAPSHOT"
+                        ${if (shouldIntegrateDaggerTrack) "classpath \"me.amanjeet.daggertrack:dagger-track:1.0.6-SNAPSHOT\"" else "" }
                       }
                     }
                     plugins {
                       id 'com.android.application'
-                      id 'me.amanjeet.daggertrack'
+                      ${if (shouldIntegrateDaggerTrack) "id 'me.amanjeet.daggertrack'" else ""}
                     }
                     android {
                       compileSdkVersion 30
@@ -144,8 +143,16 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
                         }
                       }
                     }
-                    daggerTrack {
-                        applyFor = ["debug"]
+                    ${
+                        if (shouldIntegrateDaggerTrack) {
+                            """
+                                daggerTrack {
+                                   applyFor = ["debug"]
+                                }
+                            """.trimIndent()
+                        } else {
+                            ""
+                        }
                     }
                     dependencies {
                       ${dependencies.joinToString(separator = "\n")}
@@ -208,6 +215,15 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
             return File(parentDir, srcFilePath).also {
                 if (!it.exists()) {
                     error("Unable to find transformed class ${it.path}")
+                }
+            }
+        }
+
+        fun getClassFile(srcPath: String): File {
+            val parentDir = File(projectRoot, "build/intermediates/javac/debug/classes")
+            return File(parentDir, srcPath).also {
+                if (!it.exists()) {
+                    error("Unable to find class file for $srcPath")
                 }
             }
         }
