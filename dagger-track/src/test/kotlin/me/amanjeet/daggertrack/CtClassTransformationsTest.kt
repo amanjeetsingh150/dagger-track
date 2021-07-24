@@ -14,51 +14,125 @@ import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.SI
 import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.VIEWMODEL_C_IMPL
 import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.VIEW_C_IMPL
 import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.VIEW_WITH_FRAGMENT_C_IMPL
+import me.amanjeet.daggertrack.utils.GradleTestRunner
 import me.amanjeet.daggertrack.utils.addSubcomponentAnnotation
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import java.io.File
+import org.junit.rules.TemporaryFolder
 
 internal class CtClassTransformationsTest {
+
+    @Rule
+    @JvmField
+    val testProjectDir: TemporaryFolder = TemporaryFolder
+        .builder().assureDeletion().build()
 
     private val classPool = ClassPool.getDefault()
     private val applicationClass = classPool.makeClass("android.app.Application")
 
+    private lateinit var gradleTestRunner: GradleTestRunner
+
+    @Before
+    fun setUp() {
+        gradleTestRunner = GradleTestRunner(testProjectDir)
+        gradleTestRunner.addSrc(
+            srcPath = "minimal/MyApp.java",
+            srcContent =
+            """
+                    package minimal;
+                    import android.app.Application;
+
+                    public class MyApp extends Application {
+                        @Override
+                        public void onCreate() {
+                            super.onCreate();
+                        }
+                    }
+            """.trimIndent()
+        )
+        gradleTestRunner.setAppClassName(".MyApp")
+        gradleTestRunner.addSrc(
+            srcPath = "minimal/ApplicationComponent.java",
+            srcContent = """
+                    package minimal;
+    
+                    import android.app.Application;
+                    import dagger.BindsInstance;
+                    import dagger.Component;
+                    import dagger.android.AndroidInjectionModule;
+                    import dagger.android.support.AndroidSupportInjectionModule;
+                    import minimal.MyApp;
+                    import javax.inject.Singleton;
+    
+                    @Singleton
+                    @Component(
+                        modules = {
+                            AndroidInjectionModule.class,
+                            AppModule.class,
+                            AndroidSupportInjectionModule.class
+                        }
+                    )
+                    interface ApplicationComponent {
+    
+                        void inject(MyApp myApplication);
+    
+                        @Component.Builder
+                        interface Builder {
+                            Builder bindApplication(@BindsInstance Application application);
+                            ApplicationComponent build();
+                        }
+                    }
+                """.trimIndent()
+        )
+    }
+
     @Test
-    fun `it filters out dagger components`() {
+    fun `it filters the dagger components`() {
         // given
-        classPool.makeClass("dagger.BindsInstance")
-        classPool.makeClass("dagger.Component")
-        classPool.makeClass("javax.inject.Singleton")
-        classPool.makeClass("dagger.Component.Builder")
-        val applicationComponent = File(
-            "./src/test/resources/me/amanjeet/daggertrack/di" +
-                    "/components/ApplicationComponent.class"
+        gradleTestRunner.addSrc(
+            srcPath = "minimal/AppModule.java",
+            srcContent = """
+                package minimal;
+
+                import android.app.Application;
+                import android.content.Context;
+                import dagger.Binds;
+                import dagger.Module;
+                import javax.inject.Singleton;
+
+                @Module
+                abstract class AppModule {
+
+                    @Binds
+                    @Singleton
+                    abstract Context provideApplicationContext(Application application);
+                }
+            """.trimIndent()
         )
-        val appComponent = mock<CtClass>()
-        val memberInjectorClass = mock<CtClass>()
-        val factoryClass = mock<CtClass>()
-        val activityClass = mock<CtClass>()
-        val appComponentInterface = arrayOf(classPool.makeClass(applicationComponent.inputStream()))
-        val memberInjectorInterface = arrayOf(classPool.makeClass("dagger.MembersInjector"))
-        val factoryInterface = arrayOf(classPool.makeClass("dagger.internal.Factory"))
-        whenever(appComponent.interfaces).thenReturn(appComponentInterface)
-        whenever(memberInjectorClass.interfaces).thenReturn(memberInjectorInterface)
-        whenever(factoryClass.interfaces).thenReturn(factoryInterface)
-        whenever(activityClass.interfaces).thenReturn(arrayOf())
-        whenever(appComponent.name).thenReturn("DaggerApplicationComponent")
-        val ctClassList = listOf(
-            appComponent,
-            memberInjectorClass,
-            factoryClass,
-            activityClass
+        gradleTestRunner.addDependencies(
+            "implementation 'androidx.appcompat:appcompat:1.1.0'",
+            "implementation 'com.google.dagger:dagger-android-support:2.35.1'",
+            "annotationProcessor 'com.google.dagger:dagger-android-processor:2.35.1'",
+            "annotationProcessor 'com.google.dagger:dagger-compiler:2.35.1'"
         )
+        val result = gradleTestRunner.build(shouldIntegrateDaggerTrack = false)
+        val appClassFile = result.getClassFile("minimal/MyApp.class")
+        val appModuleClassFile = result.getClassFile("minimal/AppModule.class")
+        val appComponentClassFile = result.getClassFile("minimal/ApplicationComponent.class")
+        val daggerAppComponentClassFile = result.getClassFile("minimal/DaggerApplicationComponent.class")
+        val appClass = classPool.makeClass(appClassFile.inputStream())
+        val appModule = classPool.makeClass(appModuleClassFile.inputStream())
+        val appComponent = classPool.makeClass(appComponentClassFile.inputStream())
+        val daggerAppComponent = classPool.makeClass(daggerAppComponentClassFile.inputStream())
+        val ctClassList = listOf(appClass, appComponent, appModule, daggerAppComponent)
 
         // when
         val daggerComponents = ctClassList.filterDaggerComponents()
 
         // then
         val daggerComponentNames = daggerComponents.map { it.name }
-        assertThat(daggerComponentNames).containsExactly("DaggerApplicationComponent")
+        assertThat(daggerComponentNames).containsExactly("minimal.DaggerApplicationComponent")
     }
 
     @Test

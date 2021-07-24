@@ -26,7 +26,7 @@ internal class ClassPoolFactoryTest {
     @Test
     fun `it builds class pool of external libraries`() {
         // given
-        val classFileInputSequence = File("./src/test/resources")
+        val classFileInputSequence = File("./src/test/resources/external")
             .walkTopDown()
             .map { it }
             .filter { it.absolutePath.endsWith(DOT_CLASS) }
@@ -39,8 +39,8 @@ internal class ClassPoolFactoryTest {
 
         // then, class file from dummy android jar & external class file exist in classpool
         val classFromJarFile = classPool.get("me.amanjeet.daggertrack.ClassPoolFactory")
-        val applicationComponent = classPool.get("me.amanjeet.daggertrack.di.components.ApplicationComponent")
+        val externalLibraryA = classPool.get("external.minimal.LibraryA")
         assertThat(classFromJarFile.simpleName).isEqualTo("ClassPoolFactory")
-        assertThat(applicationComponent.simpleName).isEqualTo("ApplicationComponent")
+        assertThat(externalLibraryA.simpleName).isEqualTo("LibraryA")
     }
 }
