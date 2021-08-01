@@ -1,20 +1,10 @@
 package me.amanjeet.daggertrack
 
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.mock
 import javassist.ClassPool
-import javassist.CtClass
-import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator
-import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.ACTIVITY_C_IMPL
-import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.ACTIVITY_RETAINED_C_IMPL
-import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.FRAGMENT_C_IMPL
-import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.SERVICE_C_IMPL
-import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.SINGLETON_C_IMPL
-import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.VIEWMODEL_C_IMPL
-import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.VIEW_C_IMPL
-import me.amanjeet.daggertrack.utils.DaggerComponentsFixtureCreator.Companion.VIEW_WITH_FRAGMENT_C_IMPL
 import me.amanjeet.daggertrack.utils.GradleTestRunner
-import me.amanjeet.daggertrack.utils.MinimalProjectCreator
+import me.amanjeet.daggertrack.utils.createMinimalDaggerAndroidProject
+import me.amanjeet.daggertrack.utils.createMinimalDaggerHiltProject
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -28,7 +18,6 @@ internal class CtClassTransformationsTest {
         .builder().assureDeletion().build()
 
     private val classPool = ClassPool.getDefault()
-    private val applicationClass = classPool.makeClass("android.app.Application")
 
     private lateinit var gradleTestRunner: GradleTestRunner
 
@@ -40,8 +29,7 @@ internal class CtClassTransformationsTest {
     @Test
     fun `it filters the dagger components`() {
         // given
-        MinimalProjectCreator.createDaggerAndroidProject(gradleTestRunner)
-        classPool.makeClass("dagger.android.HasAndroidInjector")
+        createMinimalDaggerAndroidProject(gradleTestRunner)
         val result = gradleTestRunner.build(shouldIntegrateDaggerTrack = false)
         val appModuleClassFile = result.getClassFile("minimal/AppModule.class")
         val appComponentClassFile = result.getClassFile("minimal/ApplicationComponent.class")
@@ -62,7 +50,7 @@ internal class CtClassTransformationsTest {
     @Test
     fun `it filters out the subcomponents from components`() {
         // given
-        MinimalProjectCreator.createDaggerAndroidProject(gradleTestRunner)
+        createMinimalDaggerAndroidProject(gradleTestRunner)
         val result = gradleTestRunner.build(shouldIntegrateDaggerTrack = false)
         val daggerAppComponentClassFile = result.getClassFile("minimal/DaggerApplicationComponent.class")
         val classFilesDirectory = daggerAppComponentClassFile.parentFile.parentFile
@@ -78,32 +66,33 @@ internal class CtClassTransformationsTest {
     }
 
     @Test
-    fun `it filters out all the dagger hilt components`() {
+    fun `it filters out all dagger hilt components`() {
         // given
-        val hiltDaggerApp = classPool.makeClass("me.amanjeet.daggertrack.Hilt_DaggerTrackApp")
-        hiltDaggerApp.superclass = applicationClass
-        val singletonRootC = DaggerComponentsFixtureCreator().createHiltComponentTree()
-        val homeActivity = mock<CtClass>()
-        val homePresenter = mock<CtClass>()
-        val ctClassList = listOf(
-            hiltDaggerApp, singletonRootC,
-            homeActivity, homePresenter
-        )
+        createMinimalDaggerHiltProject(gradleTestRunner)
+        classPool.makeClass("android.app.Application")
+        val result = gradleTestRunner.build(shouldIntegrateDaggerTrack = false)
+        val daggerSingletonComponentClassFile = result.getClassFile("minimal/DaggerMyApp_HiltComponents_SingletonC.class")
+        val applicationClassFile = result.getClassFile("minimal/Hilt_MyApp.class")
+        val classFilesDirectory = daggerSingletonComponentClassFile.parentFile.parentFile
+        val daggerSingletonComponent = classPool.makeClass(daggerSingletonComponentClassFile.inputStream())
+        val appClass = classPool.makeClass(applicationClassFile.inputStream())
+        classPool.insertClassPath(classFilesDirectory.absolutePath)
+        val ctClassList = listOf(daggerSingletonComponent, appClass)
 
         // when
-        val hiltComponents = ctClassList.filterDaggerHiltComponents()
+        val daggerHiltComponents = ctClassList.filterDaggerHiltComponents()
 
         // then
-        val hiltComponentNames = hiltComponents.map { it.name }
-        assertThat(hiltComponentNames).containsExactly(
-            SINGLETON_C_IMPL,
-            SERVICE_C_IMPL,
-            ACTIVITY_RETAINED_C_IMPL,
-            VIEWMODEL_C_IMPL,
-            ACTIVITY_C_IMPL,
-            VIEW_C_IMPL,
-            VIEW_WITH_FRAGMENT_C_IMPL,
-            FRAGMENT_C_IMPL
+        val daggerHiltComponentNames = daggerHiltComponents.map { it.name }
+        assertThat(daggerHiltComponentNames).containsExactly(
+            "minimal.DaggerMyApp_HiltComponents_SingletonC",
+            "minimal.DaggerMyApp_HiltComponents_SingletonC\$ActivityRetainedCImpl",
+            "minimal.DaggerMyApp_HiltComponents_SingletonC\$ServiceCImpl",
+            "minimal.DaggerMyApp_HiltComponents_SingletonC\$ActivityRetainedCImpl\$ActivityCImpl",
+            "minimal.DaggerMyApp_HiltComponents_SingletonC\$ActivityRetainedCImpl\$ViewModelCImpl",
+            "minimal.DaggerMyApp_HiltComponents_SingletonC\$ActivityRetainedCImpl\$ActivityCImpl\$FragmentCI",
+            "minimal.DaggerMyApp_HiltComponents_SingletonC\$ActivityRetainedCImpl\$ActivityCImpl\$ViewCI",
+            "minimal.DaggerMyApp_HiltComponents_SingletonC\$ActivityRetainedCImpl\$ActivityCImpl\$FragmentCI\$ViewWithFragmentCI"
         )
     }
 }

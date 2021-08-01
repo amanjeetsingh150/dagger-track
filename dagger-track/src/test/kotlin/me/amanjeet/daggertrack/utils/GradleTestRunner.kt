@@ -14,21 +14,28 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
 
     private val dependencies = mutableListOf<String>()
     private val activities = mutableListOf<String>()
+    private val plugins = mutableListOf<String>()
     private val additionalAndroidOptions = mutableListOf<String>()
     private var appClassName: String? = null
     private var buildFile: File? = null
     private var gradlePropertiesFile: File? = null
     private var manifestFile: File? = null
+    private var projectGradleFile: File? = null
+    private var settingsGradleFile: File? = null
 
     init {
-        tempFolder.newFolder("src", "main", "java", "minimal")
-        tempFolder.newFolder("src", "test", "java", "minimal")
-        tempFolder.newFolder("src", "main", "res")
+        tempFolder.newFolder("app", "src", "main", "java", "minimal")
+        tempFolder.newFolder("app", "src", "test", "java", "minimal")
+        tempFolder.newFolder("app","src", "main", "res")
     }
 
     // Adds project dependencies, e.g. "implementation <group>:<id>:<version>"
     fun addDependencies(vararg deps: String) {
         dependencies.addAll(deps)
+    }
+
+    fun addPlugins(vararg plugins: String) {
+        this.plugins.addAll(plugins)
     }
 
     // Adds an <activity> tag in the project's Android Manifest, e.g. "<activity name=".Foo"/>
@@ -40,9 +47,9 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
     fun addSrc(srcPath: String, srcContent: String): File {
         File(
             tempFolder.root,
-            "src/main/java/${srcPath.substringBeforeLast(File.separator)}"
+            "/app/src/main/java/${srcPath.substringBeforeLast(File.separator)}"
         ).mkdirs()
-        return tempFolder.newFile("/src/main/java/$srcPath").apply { writeText(srcContent) }
+        return tempFolder.newFile("/app/src/main/java/$srcPath").apply { writeText(srcContent) }
     }
 
     fun setAppClassName(name: String) {
@@ -92,33 +99,45 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
     }
 
     private fun setupFiles(shouldIntegrateDaggerTrack: Boolean) {
+        writeProjectGradle()
         writeBuildFile(shouldIntegrateDaggerTrack)
+        writeSettingsGradle()
         writeGradleProperties()
         writeAndroidManifest()
     }
 
+    private fun writeSettingsGradle() {
+        settingsGradleFile?.delete()
+        settingsGradleFile = tempFolder.newFile("settings.gradle").apply {
+            writeText(
+            """
+                rootProject.name = "Minimal"
+                include ':app'
+            """.trimIndent())
+        }
+    }
+
     private fun writeBuildFile(shouldIntegrateDaggerTrack: Boolean) {
         buildFile?.delete()
-        buildFile = tempFolder.newFile("build.gradle").apply {
+        buildFile = tempFolder.newFile("/app/build.gradle").apply {
             writeText(
                 """
                     buildscript {
                       repositories {
-                        google()
                         mavenCentral()
+                        google()
                         maven {
                             url 'https://s01.oss.sonatype.org/content/repositories/snapshots'
                         }
                       }
                       dependencies {
-                        classpath 'com.android.tools.build:gradle:4.2.0'
-                        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10"
                         ${if (shouldIntegrateDaggerTrack) "classpath \"me.amanjeet.daggertrack:dagger-track:1.0.6-SNAPSHOT\"" else "" }
                       }
                     }
                     plugins {
                       id 'com.android.application'
                       ${if (shouldIntegrateDaggerTrack) "id 'me.amanjeet.daggertrack'" else ""}
+                      ${plugins.joinToString(separator = "\n")}
                     }
                     android {
                       compileSdkVersion 30
@@ -133,15 +152,6 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
                           targetCompatibility 1.8
                       }
                       ${additionalAndroidOptions.joinToString(separator = "\n")}
-                    }
-                    allprojects {
-                      repositories {
-                        google()
-                        mavenCentral()
-                        maven {
-                            url 'https://s01.oss.sonatype.org/content/repositories/snapshots'
-                        }
-                      }
                     }
                     ${
                         if (shouldIntegrateDaggerTrack) {
@@ -162,20 +172,55 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
         }
     }
 
+    private fun writeProjectGradle() {
+        projectGradleFile?.delete()
+        projectGradleFile = tempFolder.newFile("build.gradle").apply {
+            writeText(
+                """
+                    allprojects {
+                        repositories {
+                            google()
+                            mavenCentral()
+                            maven {
+                                url 'https://s01.oss.sonatype.org/content/repositories/snapshots'
+                            }
+                        }
+                    }
+                    buildscript {
+                        ext.kotlin_version = "1.5.10"
+                        repositories {
+                            google()
+                            mavenCentral()
+                            maven {
+                                url 'https://s01.oss.sonatype.org/content/repositories/snapshots'
+                            }
+                        }
+                        dependencies {
+                            classpath 'com.android.tools.build:gradle:4.2.2'
+                            classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10"
+                            classpath "me.amanjeet.daggertrack:dagger-track:1.0.6-SNAPSHOT"
+                            classpath "com.google.dagger:hilt-android-gradle-plugin:2.35"
+                        }
+                    }
+                """.trimIndent()
+            )
+        }
+    }
+
     private fun writeGradleProperties() {
         gradlePropertiesFile?.delete()
         gradlePropertiesFile = tempFolder.newFile("gradle.properties").apply {
             writeText(
                 """
-        android.useAndroidX=true
-        """.trimIndent()
+                 android.useAndroidX=true
+                """.trimIndent()
             )
         }
     }
 
     private fun writeAndroidManifest() {
         manifestFile?.delete()
-        manifestFile = tempFolder.newFile("/src/main/AndroidManifest.xml").apply {
+        manifestFile = tempFolder.newFile("/app/src/main/AndroidManifest.xml").apply {
             writeText(
                 """
         <?xml version="1.0" encoding="utf-8"?>
@@ -211,7 +256,7 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
         // Finds a transformed file. The srcFilePath is relative to the app's package.
         fun getTransformedFile(srcFilePath: String): File {
             val parentDir =
-                File(projectRoot, "build/intermediates/transforms/DAGGER_TRACK/debug/0")
+                File(projectRoot, "app/build/intermediates/transforms/DAGGER_TRACK/debug/0")
             return File(parentDir, srcFilePath).also {
                 if (!it.exists()) {
                     error("Unable to find transformed class ${it.path}")
@@ -220,7 +265,7 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
         }
 
         fun getClassFile(srcPath: String): File {
-            val parentDir = File(projectRoot, "build/intermediates/javac/debug/classes")
+            val parentDir = File(projectRoot, "app/build/intermediates/javac/debug/classes")
             return File(parentDir, srcPath).also {
                 if (!it.exists()) {
                     error("Unable to find class file for $srcPath")

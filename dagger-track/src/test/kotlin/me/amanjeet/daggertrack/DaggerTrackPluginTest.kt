@@ -106,7 +106,7 @@ internal class DaggerTrackPluginTest {
 
         // when
         val result = gradleTestRunner.build()
-        val assembleTask = result.getTask(":assembleDebug")
+        val assembleTask = result.getTask(":app:assembleDebug")
 
 
         // then

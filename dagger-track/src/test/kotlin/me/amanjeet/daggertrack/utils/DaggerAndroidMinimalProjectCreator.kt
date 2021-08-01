@@ -1,26 +1,25 @@
 package me.amanjeet.daggertrack.utils
 
-object MinimalProjectCreator {
 
-    fun createDaggerAndroidProject(gradleTestRunner: GradleTestRunner) {
-        gradleTestRunner.addDependencies(
-            "implementation 'androidx.appcompat:appcompat:1.1.0'",
-            "implementation 'com.google.dagger:dagger-android-support:2.35.1'",
-            "annotationProcessor 'com.google.dagger:dagger-android-processor:2.35.1'",
-            "annotationProcessor 'com.google.dagger:dagger-compiler:2.35.1'"
-        )
-        createApplicationClass(gradleTestRunner)
-        createApplicationComponent(gradleTestRunner)
-        createDaggerModules(gradleTestRunner)
-        createHomeScreenDeps(gradleTestRunner)
-        createHomeActivity(gradleTestRunner)
-    }
+fun createMinimalDaggerAndroidProject(gradleTestRunner: GradleTestRunner) {
+    gradleTestRunner.addDependencies(
+        "implementation 'androidx.appcompat:appcompat:1.1.0'",
+        "implementation 'com.google.dagger:dagger-android-support:2.35.1'",
+        "annotationProcessor 'com.google.dagger:dagger-android-processor:2.35.1'",
+        "annotationProcessor 'com.google.dagger:dagger-compiler:2.35.1'"
+    )
+    createApplicationClass(gradleTestRunner)
+    createApplicationComponent(gradleTestRunner)
+    createDaggerModules(gradleTestRunner)
+    createHomeScreenDeps(gradleTestRunner)
+    createHomeActivity(gradleTestRunner)
+}
 
-    private fun createApplicationClass(gradleTestRunner: GradleTestRunner) {
-        gradleTestRunner.addSrc(
-            srcPath = "minimal/MyApp.java",
-            srcContent =
-            """
+private fun createApplicationClass(gradleTestRunner: GradleTestRunner) {
+    gradleTestRunner.addSrc(
+        srcPath = "minimal/MyApp.java",
+        srcContent =
+        """
                package minimal;
                
                import android.app.Application;
@@ -45,14 +44,14 @@ object MinimalProjectCreator {
                     }
                }
             """.trimIndent()
-        )
-        gradleTestRunner.setAppClassName(".MyApp")
-    }
+    )
+    gradleTestRunner.setAppClassName(".MyApp")
+}
 
-    private fun createHomeScreenDeps(gradleTestRunner: GradleTestRunner) {
-        gradleTestRunner.addSrc(
-            srcPath = "minimal/HomeDependency.java",
-            srcContent = """
+private fun createHomeScreenDeps(gradleTestRunner: GradleTestRunner) {
+    gradleTestRunner.addSrc(
+        srcPath = "minimal/HomeDependency.java",
+        srcContent = """
                     package minimal;
                     
                         class HomeDependency {
@@ -62,14 +61,14 @@ object MinimalProjectCreator {
                             }
                         }
                 """.trimIndent()
-        )
-    }
+    )
+}
 
-    private fun createHomeActivity(gradleTestRunner: GradleTestRunner) {
-        gradleTestRunner.addSrc(
-                srcPath = "minimal/HomeActivity.java",
-                srcContent =
-            """
+private fun createHomeActivity(gradleTestRunner: GradleTestRunner) {
+    gradleTestRunner.addSrc(
+        srcPath = "minimal/HomeActivity.java",
+        srcContent =
+        """
                 package minimal;
                 
                 import android.os.Bundle;
@@ -95,16 +94,16 @@ object MinimalProjectCreator {
                         }
                 }
             """.trimIndent()
-        )
-        gradleTestRunner.addActivities(
-            "<activity android:name=\".HomeActivity\"/>"
-        )
-    }
+    )
+    gradleTestRunner.addActivities(
+        "<activity android:name=\".HomeActivity\"/>"
+    )
+}
 
-    private fun createApplicationComponent(gradleTestRunner: GradleTestRunner) {
-        gradleTestRunner.addSrc(
-            srcPath = "minimal/ApplicationComponent.java",
-            srcContent = """
+private fun createApplicationComponent(gradleTestRunner: GradleTestRunner) {
+    gradleTestRunner.addSrc(
+        srcPath = "minimal/ApplicationComponent.java",
+        srcContent = """
                         package minimal;
         
                         import android.app.Application;
@@ -135,13 +134,13 @@ object MinimalProjectCreator {
                             }
                         }
                     """.trimIndent()
-        )
-    }
+    )
+}
 
-    private fun createDaggerModules(gradleTestRunner: GradleTestRunner) {
-        gradleTestRunner.addSrc(
-            srcPath = "minimal/HomeActivityModule.java",
-            srcContent = """
+private fun createDaggerModules(gradleTestRunner: GradleTestRunner) {
+    gradleTestRunner.addSrc(
+        srcPath = "minimal/HomeActivityModule.java",
+        srcContent = """
                     package minimal;
                     
                     import dagger.Module;
@@ -155,10 +154,10 @@ object MinimalProjectCreator {
                         abstract HomeActivity homeActivity();
                     }
                 """.trimIndent()
-        )
-        gradleTestRunner.addSrc(
-            srcPath = "minimal/AppModule.java",
-            srcContent = """
+    )
+    gradleTestRunner.addSrc(
+        srcPath = "minimal/AppModule.java",
+        srcContent = """
                     package minimal;
     
                     import android.app.Application;
@@ -175,10 +174,10 @@ object MinimalProjectCreator {
                         abstract Context provideApplicationContext(Application application);
                     }
                 """.trimIndent()
-        )
-        gradleTestRunner.addSrc(
-            srcPath = "minimal/HomeModule.java",
-            srcContent = """
+    )
+    gradleTestRunner.addSrc(
+        srcPath = "minimal/HomeModule.java",
+        srcContent = """
                     package minimal;
     
                     import dagger.Module;
@@ -194,6 +193,5 @@ object MinimalProjectCreator {
                         }
                     }
                 """.trimIndent()
-        )
-    }
+    )
 }
