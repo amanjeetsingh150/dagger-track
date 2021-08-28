@@ -10,9 +10,16 @@ import javassist.CtMethod
 import javassist.Modifier
 import me.amanjeet.daggertrack.utils.addSubcomponentAnnotation
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 
 internal class DaggerComponentsVisitorTest {
+
+    @Rule
+    @JvmField
+    val testProjectDir: TemporaryFolder = TemporaryFolder
+        .builder().assureDeletion().build()
 
     private val classPool = ClassPool.getDefault()
     private val applicationComponent = prepareComponent(
@@ -43,39 +50,6 @@ internal class DaggerComponentsVisitorTest {
         whenever(activitySubcomponentImpl.nestedClasses).thenReturn(arrayOf(fragmentSubcomponentImpl))
         whenever(activitySubcomponentImpl.interfaces).thenReturn(arrayOf(activitySubcomponent))
         whenever(fragmentSubcomponentImpl.interfaces).thenReturn(arrayOf(fragmentSubcomponent))
-    }
-
-    @Test
-    fun `it visits the components and their subcomponents and add tracking logs on inject`() {
-        // when
-        val daggerComponentsVisitor = DaggerComponentsVisitorImpl()
-        daggerComponentsVisitor.visitDaggerAndroidComponents(applicationComponent)
-
-        // then
-        arrayOf(applicationComponent, activitySubcomponentImpl, fragmentSubcomponentImpl)
-            .forEach {
-                val injectMethod = it.methods.find { method -> method.name == "inject" }
-                val injectParam = injectMethod!!.parameterTypes.first().name
-                verify(injectMethod).addLocalVariable("initialTime", CtClass.longType)
-                verify(injectMethod).addLocalVariable("initialCpuTime", CtClass.longType)
-                verify(injectMethod).addLocalVariable("endTime", CtClass.longType)
-                verify(injectMethod).addLocalVariable("endCpuTime", CtClass.longType)
-                verify(injectMethod).insertBefore(
-                    """
-                       long initialTime = me.amanjeet.daggertrack.DaggerTrackClocks.getUptimeMillis();
-                       long initialCpuTime = me.amanjeet.daggertrack.DaggerTrackClocks.getCpuTimeMillis();
-                    """.trimIndent()
-                )
-                verify(injectMethod).insertAfter(
-                    """
-                        long endTime = me.amanjeet.daggertrack.DaggerTrackClocks.getUptimeMillis();
-                        long endCpuTime = me.amanjeet.daggertrack.DaggerTrackClocks.getCpuTimeMillis();
-                        android.util.Log.d("DaggerTrack","Total time of ${injectParam}: " + (endTime - initialTime) + "ms");
-                        android.util.Log.d("DaggerTrack","Total On CPU time of ${injectParam}: " + (endCpuTime - initialCpuTime) + "ms");
-                        android.util.Log.d("DaggerTrack","Total Off CPU time of ${injectParam}: " + ((endTime - initialTime) - (endCpuTime - initialCpuTime)) + "ms");
-            """.trimIndent()
-                )
-            }
     }
 
     @Test

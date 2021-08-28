@@ -3,7 +3,11 @@ package me.amanjeet.daggertrack.utils
 
 fun createMinimalDaggerAndroidProject(gradleTestRunner: GradleTestRunner) {
     gradleTestRunner.addDependencies(
+        "implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.5.10'",
         "implementation 'androidx.appcompat:appcompat:1.1.0'",
+        "implementation 'androidx.core:core-ktx:1.5.0'",
+        "implementation 'androidx.constraintlayout:constraintlayout:2.0.4'",
+        "implementation 'me.amanjeet.daggertrack:dagger-track-clocks:1.0.6-SNAPSHOT'",
         "implementation 'com.google.dagger:dagger-android-support:2.35.1'",
         "annotationProcessor 'com.google.dagger:dagger-android-processor:2.35.1'",
         "annotationProcessor 'com.google.dagger:dagger-compiler:2.35.1'"
@@ -26,6 +30,7 @@ private fun createApplicationClass(gradleTestRunner: GradleTestRunner) {
                import javax.inject.Inject;
                import dagger.android.AndroidInjector;
                import dagger.android.DispatchingAndroidInjector;
+               import minimal.DaggerApplicationComponent;
                import dagger.android.HasAndroidInjector;
                
                public class MyApp extends Application implements HasAndroidInjector {
@@ -36,6 +41,11 @@ private fun createApplicationClass(gradleTestRunner: GradleTestRunner) {
                    @Override
                    public void onCreate() {
                        super.onCreate();
+                       DaggerApplicationComponent
+                            .builder()
+                            .bindApplication(this)
+                            .build()
+                            .inject(this);
                    }
                    
                    @Override
@@ -75,16 +85,21 @@ private fun createHomeActivity(gradleTestRunner: GradleTestRunner) {
                 import androidx.appcompat.app.AppCompatActivity;
                 import javax.inject.Inject;
                 import dagger.android.AndroidInjector;
+                import dagger.android.AndroidInjection;
                 import dagger.android.DispatchingAndroidInjector;
                 import dagger.android.HasAndroidInjector;
                 
-                    public class HomeActivity extends AppCompatActivity implements HasAndroidInjector {
+                public class HomeActivity extends AppCompatActivity implements HasAndroidInjector {
             
                         @Inject
                         DispatchingAndroidInjector<Object> androidInjector;
+                        
+                        @Inject 
+                        HomeDependency homeDependency;
     
                         @Override
                         public void onCreate(Bundle savedInstanceState) {
+                            AndroidInjection.inject(this);
                             super.onCreate(savedInstanceState);
                         }
                         
