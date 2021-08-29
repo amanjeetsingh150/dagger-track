@@ -3,10 +3,7 @@ package me.amanjeet.daggertrack
 import com.google.common.truth.Truth.assertThat
 import javassist.ClassPool
 import javassist.bytecode.ClassFile
-import me.amanjeet.daggertrack.utils.GradleTestRunner
-import me.amanjeet.daggertrack.utils.createMinimalDaggerAndroidProject
-import me.amanjeet.daggertrack.utils.getCtClassFromName
-import me.amanjeet.daggertrack.utils.getMethodCalls
+import me.amanjeet.daggertrack.utils.*
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Before
 import org.junit.Rule
@@ -101,6 +98,33 @@ internal class DaggerTrackPluginTest {
         assertThat(assembleTask.outcome).isEqualTo(TaskOutcome.SUCCESS)
         verifyDaggerAppComponentTracking(classPool, result)
         verifyDaggerSubcomponentTracking(classPool, result)
+    }
+
+    @Test
+    fun `it adds clock tracking to dagger hilt components`() {
+        // given
+        createMinimalDaggerHiltProject(gradleTestRunner)
+
+        // when
+        val result = gradleTestRunner.build()
+        val assembleTask = result.getTask(":app:assembleDebug")
+
+        // then
+        assertThat(assembleTask.outcome).isEqualTo(TaskOutcome.SUCCESS)
+
+        val homeActivityDaggerHiltComponent = classPool.getCtClassFromName(result,
+            "minimal/DaggerMyApp_HiltComponents_SingletonC\$ActivityRetainedCImpl\$ActivityCImpl.class"
+        )
+        val expectedInjectHomeActivityMethodCalls = arrayOf(
+            "getUptimeMillis",
+            "getCpuTimeMillis",
+            "injectHomeActivity2",
+            "getUptimeMillis",
+            "getCpuTimeMillis"
+        )
+        val injectHomeActivityMethodCalls = homeActivityDaggerHiltComponent.getMethodCalls("injectHomeActivity")
+            .filter { expectedInjectHomeActivityMethodCalls.contains(it) }
+        assertThat(injectHomeActivityMethodCalls).isEqualTo(expectedInjectHomeActivityMethodCalls.toList())
     }
 
     private fun verifyDaggerSubcomponentTracking(
