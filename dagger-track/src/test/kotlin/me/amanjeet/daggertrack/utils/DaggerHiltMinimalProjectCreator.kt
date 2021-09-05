@@ -5,7 +5,7 @@ fun createMinimalDaggerHiltProject(gradleTestRunner: GradleTestRunner) {
         "implementation 'androidx.appcompat:appcompat:1.1.0'",
         "implementation 'com.google.dagger:dagger-android-support:2.35.1'",
         "implementation 'com.google.dagger:hilt-android:2.35'",
-        "implementation 'me.amanjeet.daggertrack:dagger-track-clocks:1.0.6-SNAPSHOT'",
+        "implementation 'me.amanjeet.daggertrack:dagger-track-clocks:LOCAL_SNAPSHOT'",
         "annotationProcessor 'com.google.dagger:hilt-android-compiler:2.35'",
         "annotationProcessor 'com.google.dagger:dagger-android-processor:2.35.1'",
         "annotationProcessor 'com.google.dagger:dagger-compiler:2.35.1'"

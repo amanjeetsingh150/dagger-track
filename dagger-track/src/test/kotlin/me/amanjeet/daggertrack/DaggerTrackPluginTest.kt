@@ -67,7 +67,7 @@ internal class DaggerTrackPluginTest {
             "implementation 'androidx.appcompat:appcompat:1.1.0'",
             "implementation 'androidx.core:core-ktx:1.5.0'",
             "implementation 'androidx.constraintlayout:constraintlayout:2.0.4'",
-            "implementation 'me.amanjeet.daggertrack:dagger-track-clocks:1.0.6-SNAPSHOT'"
+            "implementation 'me.amanjeet.daggertrack:dagger-track-clocks:LOCAL_SNAPSHOT'"
         )
 
         // when

@@ -77,13 +77,14 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
                     |     repositories {
                     |         google()
                     |         mavenCentral()
+                    |         mavenLocal()
                     |         maven {
                     |            url 'https://s01.oss.sonatype.org/content/repositories/snapshots'
                     |         }
                     |     }
                     |     dependencies {
                     |         classpath "com.android.tools.build:gradle:4.2.1"
-                    |         classpath "me.amanjeet.daggertrack:dagger-track:1.0.6-SNAPSHOT"
+                    |         classpath "me.amanjeet.daggertrack:dagger-track:LOCAL_SNAPSHOT"
                     |     }
                     | }
                     |
@@ -126,12 +127,13 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
                       repositories {
                         mavenCentral()
                         google()
+                        mavenLocal()
                         maven {
                             url 'https://s01.oss.sonatype.org/content/repositories/snapshots'
                         }
                       }
                       dependencies {
-                        ${if (shouldIntegrateDaggerTrack) "classpath \"me.amanjeet.daggertrack:dagger-track:1.0.6-SNAPSHOT\"" else "" }
+                        ${if (shouldIntegrateDaggerTrack) "classpath \"me.amanjeet.daggertrack:dagger-track:LOCAL_SNAPSHOT\"" else "" }
                       }
                     }
                     plugins {
@@ -181,6 +183,7 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
                         repositories {
                             google()
                             mavenCentral()
+                            mavenLocal()
                             maven {
                                 url 'https://s01.oss.sonatype.org/content/repositories/snapshots'
                             }
@@ -191,6 +194,7 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
                         repositories {
                             google()
                             mavenCentral()
+                            mavenLocal()
                             maven {
                                 url 'https://s01.oss.sonatype.org/content/repositories/snapshots'
                             }
@@ -198,7 +202,7 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
                         dependencies {
                             classpath 'com.android.tools.build:gradle:4.2.2'
                             classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10"
-                            classpath "me.amanjeet.daggertrack:dagger-track:1.0.6-SNAPSHOT"
+                            classpath "me.amanjeet.daggertrack:dagger-track:LOCAL_SNAPSHOT"
                             classpath "com.google.dagger:hilt-android-gradle-plugin:2.35"
                         }
                     }

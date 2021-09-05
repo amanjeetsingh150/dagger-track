@@ -7,7 +7,7 @@ fun createMinimalDaggerAndroidProject(gradleTestRunner: GradleTestRunner) {
         "implementation 'androidx.appcompat:appcompat:1.1.0'",
         "implementation 'androidx.core:core-ktx:1.5.0'",
         "implementation 'androidx.constraintlayout:constraintlayout:2.0.4'",
-        "implementation 'me.amanjeet.daggertrack:dagger-track-clocks:1.0.6-SNAPSHOT'",
+        "implementation 'me.amanjeet.daggertrack:dagger-track-clocks:LOCAL_SNAPSHOT'",
         "implementation 'com.google.dagger:dagger-android-support:2.35.1'",
         "annotationProcessor 'com.google.dagger:dagger-android-processor:2.35.1'",
         "annotationProcessor 'com.google.dagger:dagger-compiler:2.35.1'"
