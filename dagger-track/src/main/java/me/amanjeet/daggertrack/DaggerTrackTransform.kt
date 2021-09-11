@@ -12,6 +12,7 @@ import me.amanjeet.daggertrack.transform.DaggerAndroidClassTransform
 import me.amanjeet.daggertrack.transform.DaggerHiltClassTransform
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import java.io.File
 
 internal class DaggerTrackTransform(
     private val project: Project,
@@ -53,12 +54,7 @@ internal class DaggerTrackTransform(
             Format.DIRECTORY
         )
         transformInvocation.outputProvider.deleteAll()
-        val defaultClassPool = ClassPool.getDefault()
-        val classPoolFactory = ClassPoolFactory(defaultClassPool)
-        val classPool = classPoolFactory.buildProjectClassPool(
-            transformInvocation,
-            android
-        )
+        val classPool = createClassPool(transformInvocation)
         val shouldApplyTransform = daggerTrackExtension.applyFor?.find {
             variantName.endsWith(it, true)
         } != null
@@ -75,6 +71,38 @@ internal class DaggerTrackTransform(
             }
         }
         copyAllJars(transformInvocation)
+    }
+
+    private fun createClassPool(transformInvocation: TransformInvocation): ClassPool {
+        val projectInputs = getProjectInput(transformInvocation)
+        val defaultClassPool = ClassPool.getDefault()
+        val classPoolFactory = ClassPoolFactory(defaultClassPool)
+        return classPoolFactory.buildProjectClassPool(projectInputs, android)
+    }
+
+    /**
+     * Creates a list of files from both direct inputs and referenced inputs of transform
+     *
+     * @param transformInvocation TransformInvocation object for [DaggerTrackTransform]
+     * @return list of file containing both direct and referenced input of transform
+     */
+    private fun getProjectInput(transformInvocation: TransformInvocation): List<File> {
+        // External deps.
+        val referencedDirInputs = transformInvocation.referencedInputs.map { it.directoryInputs }
+            .flatten()
+            .map { it.file }
+        val referencedJarInputs = transformInvocation.referencedInputs.map { it.jarInputs }
+            .flatten()
+            .map { it.file }
+        // Project files
+        val projectDirInputs = transformInvocation.inputs.map { it.directoryInputs }
+            .flatten()
+            .map { it.file }
+        val projectJarInputs = transformInvocation.inputs.map { it.jarInputs }
+            .flatten()
+            .map { it.file }
+        return referencedDirInputs + referencedJarInputs +
+                projectDirInputs + projectJarInputs
     }
 
     private fun validateDaggerClocks(classPool: ClassPool) {
