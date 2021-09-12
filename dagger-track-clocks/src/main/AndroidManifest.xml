@@ -2,4 +2,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="me.amanjeet.daggertrack">
 
+    <application>
+        <provider
+            android:name=".DaggerTrackInstaller"
+            android:authorities="${applicationId}.dagger-track-installer"
+            android:enabled="@bool/dagger_track_auto_install"
+            android:exported="false">
+            <meta-data
+                android:name="me.amanjeet.daggertrack.MinWallClockTime"
+                android:value="@integer/min_wall_clock_time_ms" />
+            <meta-data
+                android:name="me.amanjeet.daggertrack.MinOnCpuTime"
+                android:value="@integer/min_on_cpu_time_ms" />
+            <meta-data
+                android:name="me.amanjeet.daggertrack.MinOffCpuTime"
+                android:value="@integer/min_off_cpu_time_ms" />
+        </provider>
+    </application>
 </manifest>

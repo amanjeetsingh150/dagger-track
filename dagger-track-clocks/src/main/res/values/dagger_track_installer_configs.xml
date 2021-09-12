@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="min_wall_clock_time_ms">0</integer>
+    <integer name="min_on_cpu_time_ms">0</integer>
+    <integer name="min_off_cpu_time_ms">0</integer>
+    <bool name="dagger_track_auto_install">true</bool>
+</resources>
