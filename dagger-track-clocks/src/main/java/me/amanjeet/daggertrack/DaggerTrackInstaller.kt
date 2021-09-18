@@ -11,6 +11,7 @@ class DaggerTrackInstaller : ContentProvider() {
 
     override fun onCreate(): Boolean {
         val application = context!!.applicationContext as Application
+
         val applicationInfo = application.packageManager.getApplicationInfo(
             application.packageName,
             PackageManager.GET_META_DATA
@@ -20,6 +21,15 @@ class DaggerTrackInstaller : ContentProvider() {
         val minOnCpuTime = bundle.getInt(MIN_ON_CPU_TIME, 0)
         val minOffCpuTime = bundle.getInt(MIN_OFF_CPU_TIME, 0)
         val loggerType = DaggerTrack.LoggerType.TRACKER_ACTIVITY
+        
+        DaggerTrack.config = DaggerTrack.config.copy(
+            minWallClockTimeMillis = minWallClockTime.toLong(),
+            minOnCpuTimeMillis = minOnCpuTime.toLong(),
+            minOffCpuTimeMillis = minOffCpuTime.toLong(),
+            loggerType = loggerType
+        )
+        DaggerTrack.manualInstall()
+
         return true
     }
 
