@@ -35,25 +35,8 @@ internal class DaggerComponentsVisitorImpl : DaggerComponentsVisitor {
     }
 
     private fun setTrackingLogs(injectMethod: CtMethod, injectParam: String?) {
-        injectMethod.addLocalVariable("initialTime", CtClass.longType)
-        injectMethod.addLocalVariable("initialCpuTime", CtClass.longType)
-        injectMethod.insertBefore(
-            """
-                long initialTime = me.amanjeet.daggertrack.DaggerTrackClocks.getUptimeMillis();
-                long initialCpuTime = me.amanjeet.daggertrack.DaggerTrackClocks.getCpuTimeMillis();
-            """.trimIndent()
-        )
-        injectMethod.addLocalVariable("endTime", CtClass.longType)
-        injectMethod.addLocalVariable("endCpuTime", CtClass.longType)
-        injectMethod.insertAfter(
-            """
-                long endTime = me.amanjeet.daggertrack.DaggerTrackClocks.getUptimeMillis();
-                long endCpuTime = me.amanjeet.daggertrack.DaggerTrackClocks.getCpuTimeMillis();
-                android.util.Log.d("DaggerTrack","Total time of ${injectParam}: " + (endTime - initialTime) + "ms");
-                android.util.Log.d("DaggerTrack","Total On CPU time of ${injectParam}: " + (endCpuTime - initialCpuTime) + "ms");
-                android.util.Log.d("DaggerTrack","Total Off CPU time of ${injectParam}: " + ((endTime - initialTime) - (endCpuTime - initialCpuTime)) + "ms");
-            """.trimIndent()
-        )
+        injectMethod.insertBefore("me.amanjeet.daggertrack.DaggerTrack.INSTANCE.onInjectionStart();")
+        injectMethod.insertAfter("me.amanjeet.daggertrack.DaggerTrack.INSTANCE.onInjectionEnd(\"${injectParam.toString()}\");")
     }
 
     private fun defrostCtClass(ctClass: CtClass) {

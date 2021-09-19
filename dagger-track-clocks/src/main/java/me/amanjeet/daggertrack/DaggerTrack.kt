@@ -1,6 +1,8 @@
 package me.amanjeet.daggertrack
 
 import android.util.Log
+import me.amanjeet.daggertrack.logger.Logger
+import me.amanjeet.daggertrack.logger.LoggerFactory
 
 object DaggerTrack {
 
@@ -11,6 +13,8 @@ object DaggerTrack {
             field = newConfig
             logConfigChange(previousConfig, newConfig)
         }
+
+    private lateinit var logger: Logger
 
     data class Config(
         /** Minimum tolerance for wall clock time, defaults to 0ms **/
@@ -58,6 +62,7 @@ object DaggerTrack {
         CONSOLE
     }
 
+    @JvmStatic
     fun manualInstall() {
         check(
             config.minOffCpuTimeMillis >= 0 ||
@@ -65,6 +70,23 @@ object DaggerTrack {
                     config.minWallClockTimeMillis >= 0
         ) {
             "Minimum tolerance for wall clock time, off cpu time or on cpu time should be at least 0 ms."
+        }
+
+        val loggerType = config.loggerType
+        logger = LoggerFactory.createLogger(loggerType)
+    }
+
+    @JvmStatic
+    fun onInjectionStart() {
+        if (::logger.isInitialized) {
+            logger.onInjectionStart()
+        }
+    }
+
+    @JvmStatic
+    fun onInjectionEnd(injectParam: String) {
+        if (::logger.isInitialized) {
+            logger.onInjectionEnd(injectParam)
         }
     }
 
