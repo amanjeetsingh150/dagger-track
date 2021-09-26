@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.squareup.leakcanary.instrumentation.test">
+
+    <application android:name="me.amanjeet.daggertrack.instrumentation.TestApplication"
+        android:theme="@style/Theme.MaterialComponents.DayNight.DarkActionBar">
+        <activity
+            android:name="me.amanjeet.daggertrack.instrumentation.DaggerTrackConsoleActivity" />
+    </application>
+</manifest>

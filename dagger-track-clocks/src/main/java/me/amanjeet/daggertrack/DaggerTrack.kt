@@ -65,8 +65,8 @@ object DaggerTrack {
     @JvmStatic
     fun manualInstall() {
         check(
-            config.minOffCpuTimeMillis >= 0 ||
-                    config.minOnCpuTimeMillis >= 0 ||
+            config.minOffCpuTimeMillis >= 0 &&
+                    config.minOnCpuTimeMillis >= 0 &&
                     config.minWallClockTimeMillis >= 0
         ) {
             "Minimum tolerance for wall clock time, off cpu time or on cpu time should be at least 0 ms."
