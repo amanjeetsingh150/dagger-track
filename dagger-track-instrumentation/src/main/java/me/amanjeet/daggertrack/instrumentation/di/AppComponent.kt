@@ -6,7 +6,7 @@ import dagger.Component
 import dagger.android.AndroidInjectionModule
 import dagger.android.support.AndroidSupportInjectionModule
 import me.amanjeet.daggertrack.instrumentation.AppModule
-import me.amanjeet.daggertrack.instrumentation.TestApplication
+import me.amanjeet.daggertrack.instrumentation.DaggerTrackApp
 import javax.inject.Singleton
 
 @Singleton
@@ -18,7 +18,7 @@ import javax.inject.Singleton
     ]
 )
 interface AppComponent {
-    fun inject(testApplication: TestApplication)
+    fun inject(daggerTrackApp: DaggerTrackApp)
 
     @Component.Builder
     interface Builder {

@@ -1,8 +1,21 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        mavenLocal()
+    }
+    dependencies {
+        classpath "me.amanjeet.daggertrack:dagger-track:LOCAL_SNAPSHOT"
+    }
+}
+
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'kotlin-kapt'
 }
+
+apply plugin: 'me.amanjeet.daggertrack'
 
 android {
     compileSdkVersion 30
@@ -14,7 +27,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "me.amanjeet.daggertrack.instrumentation.DaggerTrackTestRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
 
@@ -33,7 +46,12 @@ android {
     }
 }
 
+daggerTrack {
+    applyFor = ["androidTest", "debug"]
+}
+
 dependencies {
+    implementation project(":dagger-track-clocks")
     androidTestImplementation project(":dagger-track-clocks")
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.6.0'
