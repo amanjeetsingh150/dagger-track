@@ -1,7 +1,7 @@
 package me.amanjeet.daggertrack
 
 import android.util.Log
-import me.amanjeet.daggertrack.logger.Logger
+import me.amanjeet.daggertrack.logger.DaggertrackLogger
 import me.amanjeet.daggertrack.logger.LoggerFactory
 
 object DaggerTrack {
@@ -14,7 +14,7 @@ object DaggerTrack {
             logConfigChange(previousConfig, newConfig)
         }
 
-    private lateinit var logger: Logger
+    private lateinit var logger: DaggertrackLogger
 
     data class Config(
         /** Minimum tolerance for wall clock time, defaults to 0ms **/

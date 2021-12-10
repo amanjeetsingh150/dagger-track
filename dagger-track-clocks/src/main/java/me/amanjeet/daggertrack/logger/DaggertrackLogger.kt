@@ -1,6 +1,6 @@
 package me.amanjeet.daggertrack.logger
 
-internal interface Logger {
+internal interface DaggertrackLogger {
     fun onInjectionStart()
     fun onInjectionEnd(injectParam: String)
 }

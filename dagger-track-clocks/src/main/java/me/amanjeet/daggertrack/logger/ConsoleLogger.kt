@@ -4,7 +4,7 @@ import android.os.SystemClock
 import android.util.Log
 import me.amanjeet.daggertrack.DaggerTrackClocks
 
-internal class ConsoleLogger : Logger {
+internal class ConsoleLogger : DaggertrackLogger {
 
     private var injectionStartUptimeMillis: Long = 0
     private var injectionStartCpuTimeMillis: Long = 0

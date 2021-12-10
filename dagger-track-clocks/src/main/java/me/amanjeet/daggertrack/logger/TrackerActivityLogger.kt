@@ -1,6 +1,6 @@
 package me.amanjeet.daggertrack.logger
 
-internal class TrackerActivityLogger: Logger {
+internal class TrackerActivityLogger: DaggertrackLogger {
 
     override fun onInjectionStart() {
         TODO("Not yet implemented")
