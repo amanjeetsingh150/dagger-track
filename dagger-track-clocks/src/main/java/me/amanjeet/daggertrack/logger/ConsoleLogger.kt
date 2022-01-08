@@ -1,29 +1,28 @@
 package me.amanjeet.daggertrack.logger
 
-import android.os.SystemClock
-import android.util.Log
 import me.amanjeet.daggertrack.DaggerTrackClocks
+import me.amanjeet.daggertrack.Logger
 
-internal class ConsoleLogger : DaggertrackLogger {
+internal class ConsoleLogger(
+    private val injectionTimeLogger: Logger,
+    private val daggerTrackClocks: DaggerTrackClocks
+) : DaggertrackLogger {
 
     private var injectionStartUptimeMillis: Long = 0
     private var injectionStartCpuTimeMillis: Long = 0
 
     override fun onInjectionStart() {
-        injectionStartUptimeMillis = DaggerTrackClocks.getUptimeMillis()
-        injectionStartCpuTimeMillis = DaggerTrackClocks.getCpuTimeMillis()
+        injectionStartUptimeMillis = daggerTrackClocks.getUptimeMillis()
+        injectionStartCpuTimeMillis = daggerTrackClocks.getCpuTimeMillis()
     }
 
     override fun onInjectionEnd(injectParam: String) {
         if (injectionStartUptimeMillis == 0L) return
-        val injectionTime = SystemClock.uptimeMillis() - injectionStartUptimeMillis
-        val injectionCpuTime = DaggerTrackClocks.getCpuTimeMillis() - injectionStartCpuTimeMillis
+        val injectionTime = daggerTrackClocks.getUptimeMillis() - injectionStartUptimeMillis
+        val injectionCpuTime = daggerTrackClocks.getCpuTimeMillis() - injectionStartCpuTimeMillis
         val injectionOffCpuTime = injectionTime - injectionCpuTime
-        Log.d("DaggerTrack", "Total time for $injectParam injection: $injectionTime ms")
-        Log.d("DaggerTrack", "Total on cpu time for $injectParam injection: $injectionCpuTime ms")
-        Log.d(
-            "DaggerTrack",
-            "Total off cpu time for $injectParam injection: $injectionOffCpuTime ms"
-        )
+        injectionTimeLogger.d("Total time for $injectParam injection: $injectionTime ms")
+        injectionTimeLogger.d("Total on cpu time for $injectParam injection: $injectionCpuTime ms")
+        injectionTimeLogger.d("Total off cpu time for $injectParam injection: $injectionOffCpuTime ms")
     }
 }

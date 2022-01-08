@@ -18,7 +18,7 @@ inline uint64_t timeval_sum_to_millis(timeval &tv1, timeval &tv2) {
 }
 
 extern "C" jlong
-Java_me_amanjeet_daggertrack_DaggerTrackClocks_getCpuTime(JNIEnv *env, jobject clazz) {
+Java_me_amanjeet_daggertrack_DaggerTrackClocksImpl_getCpuTime(JNIEnv *env, jobject clazz) {
     return get_cpu_time_from_rusage();
 }
 

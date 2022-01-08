@@ -2,19 +2,23 @@ package me.amanjeet.daggertrack
 
 import android.os.SystemClock
 
-object DaggerTrackClocks {
+interface DaggerTrackClocks {
+
+    fun getUptimeMillis(): Long
+    fun getCpuTimeMillis(): Long
+}
+
+object DaggerTrackClocksImpl: DaggerTrackClocks {
 
     init {
         System.loadLibrary("cpu_time")
     }
 
-    @JvmStatic
-    fun getUptimeMillis(): Long {
+    override fun getUptimeMillis(): Long {
         return SystemClock.uptimeMillis()
     }
 
-    @JvmStatic
-    fun getCpuTimeMillis(): Long {
+    override fun getCpuTimeMillis(): Long {
         return getCpuTime()
     }
 

@@ -73,7 +73,7 @@ object DaggerTrack {
         }
 
         val loggerType = config.loggerType
-        logger = LoggerFactory.createLogger(loggerType)
+        logger = LoggerFactory.createLogger(loggerType, DaggerTrackClocksImpl)
     }
 
     @JvmStatic
