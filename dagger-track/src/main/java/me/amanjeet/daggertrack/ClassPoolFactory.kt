@@ -1,8 +1,8 @@
 package me.amanjeet.daggertrack
 
+import com.android.build.api.transform.TransformInvocation
 import com.android.build.gradle.BaseExtension
 import javassist.ClassPool
-import java.io.File
 
 /**
  * A factory which helps creating [ClassPool] for the project
@@ -15,15 +15,21 @@ internal class ClassPoolFactory(private val classPool: ClassPool) {
      * Builds class pool of internal project files, external dependencies android jar from
      * sdk directory.
      *
-     * @param projectInputs Project files including both direct and referenced of module
+     * @param transformInvocation TransformInvocation to copy jar and directory inputs
      * @param android BaseExtension for android to extract android.jar of compiledSdkVersion from
      * sdk directory
      */
-    fun buildProjectClassPool(
-        projectInputs: List<File>,
-        android: BaseExtension
-    ): ClassPool {
-        projectInputs.forEach { classPool.insertClassPath(it.absolutePath) }
+    fun buildProjectClassPool(transformInvocation: TransformInvocation, android: BaseExtension): ClassPool {
+        // External Deps
+        transformInvocation.referencedInputs.forEach { transformInput ->
+            transformInput.directoryInputs.forEach { classPool.insertClassPath(it.file.absolutePath) }
+            transformInput.jarInputs.forEach { classPool.insertClassPath(it.file.absolutePath) }
+        }
+        // Project files
+        transformInvocation.inputs.forEach { transformInput ->
+            transformInput.directoryInputs.forEach{ classPool.insertClassPath(it.file.absolutePath) }
+            transformInput.jarInputs.forEach { classPool.insertClassPath(it.file.absolutePath) }
+        }
         // android jar from compiled sdk
         val androidJar = "${android.sdkDirectory.absolutePath}/platforms" +
                 "/${android.compileSdkVersion}/android.jar"
