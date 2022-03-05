@@ -260,7 +260,7 @@ class GradleTestRunner(private val tempFolder: TemporaryFolder) {
         // Finds a transformed file. The srcFilePath is relative to the app's package.
         fun getTransformedFile(srcFilePath: String): File {
             val parentDir =
-                File(projectRoot, "app/build/intermediates/transforms/DAGGER_TRACK/debug/0")
+                File(projectRoot, "app/build/intermediates/transforms/DaggerTrackTransform/debug/1")
             return File(parentDir, srcFilePath).also {
                 if (!it.exists()) {
                     error("Unable to find transformed class ${it.path}")

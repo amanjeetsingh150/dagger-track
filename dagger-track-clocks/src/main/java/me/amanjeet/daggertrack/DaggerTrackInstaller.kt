@@ -17,9 +17,9 @@ class DaggerTrackInstaller : ContentProvider() {
             PackageManager.GET_META_DATA
         )
         val bundle = applicationInfo.metaData
-        val minWallClockTime = bundle.getInt(MIN_WALL_CLOCK_TIME, 0)
-        val minOnCpuTime = bundle.getInt(MIN_ON_CPU_TIME, 0)
-        val minOffCpuTime = bundle.getInt(MIN_OFF_CPU_TIME, 0)
+        val minWallClockTime = bundle?.getInt(MIN_WALL_CLOCK_TIME, 0) ?: 0
+        val minOnCpuTime = bundle.getInt(MIN_ON_CPU_TIME, 0) ?: 0
+        val minOffCpuTime = bundle.getInt(MIN_OFF_CPU_TIME, 0) ?: 0
         val loggerType = DaggerTrack.LoggerType.TRACKER_ACTIVITY
         
         DaggerTrack.config = DaggerTrack.config.copy(

@@ -12,8 +12,6 @@ internal class DaggerComponentsVisitorImpl : DaggerComponentsVisitor {
     override fun visitDaggerAndroidComponents(daggerComponent: CtClass) {
         val methodPredicate: (ctMethod: CtMethod) -> Boolean = { it.name == "inject" }
         setComponentTracking(daggerComponent, methodPredicate)
-        daggerComponent.filterSubcomponents()
-            .forEach { setComponentTracking(it, methodPredicate) }
     }
 
     override fun visitDaggerHiltComponents(daggerComponent: CtClass) {
@@ -35,8 +33,8 @@ internal class DaggerComponentsVisitorImpl : DaggerComponentsVisitor {
     }
 
     private fun setTrackingLogs(injectMethod: CtMethod, injectParam: String?) {
-        injectMethod.insertBefore("me.amanjeet.daggertrack.DaggerTrack.INSTANCE.onInjectionStart();")
-        injectMethod.insertAfter("me.amanjeet.daggertrack.DaggerTrack.INSTANCE.onInjectionEnd(\"${injectParam.toString()}\");")
+        injectMethod.insertBefore("me.amanjeet.daggertrack.DaggerTrack.onInjectionStart();")
+        injectMethod.insertAfter("me.amanjeet.daggertrack.DaggerTrack.onInjectionEnd(\"${injectParam.toString()}\");")
     }
 
     private fun defrostCtClass(ctClass: CtClass) {

@@ -116,11 +116,9 @@ internal class DaggerTrackPluginTest {
             "minimal/DaggerMyApp_HiltComponents_SingletonC\$ActivityRetainedCImpl\$ActivityCImpl.class"
         )
         val expectedInjectHomeActivityMethodCalls = arrayOf(
-            "getUptimeMillis",
-            "getCpuTimeMillis",
+            "onInjectionStart",
             "injectHomeActivity2",
-            "getUptimeMillis",
-            "getCpuTimeMillis"
+            "onInjectionEnd"
         )
         val injectHomeActivityMethodCalls = homeActivityDaggerHiltComponent.getMethodCalls("injectHomeActivity")
             .filter { expectedInjectHomeActivityMethodCalls.contains(it) }
@@ -136,11 +134,9 @@ internal class DaggerTrackPluginTest {
             "minimal/DaggerApplicationComponent\$HomeActivitySubcomponentImpl.class"
         )
         val expectedInjectHomeActivityMethodCalls = arrayOf(
-            "getUptimeMillis",
-            "getCpuTimeMillis",
+            "onInjectionStart",
             "injectHomeActivity",
-            "getUptimeMillis",
-            "getCpuTimeMillis"
+            "onInjectionEnd"
         )
         val injectHomeActivityMethodCalls = daggerHomeSubComponent.getMethodCalls("inject")
             .filter { expectedInjectHomeActivityMethodCalls.contains(it) }
@@ -156,11 +152,9 @@ internal class DaggerTrackPluginTest {
             "minimal/DaggerApplicationComponent.class"
         )
         val expectedInjectMyAppMethodCalls = arrayOf(
-            "getUptimeMillis",
-            "getCpuTimeMillis",
+            "onInjectionStart",
             "injectMyApp",
-            "getUptimeMillis",
-            "getCpuTimeMillis"
+            "onInjectionEnd"
         )
         val injectMyAppMethodCalls = daggerApplicationComponent.getMethodCalls("inject")
             .filter { expectedInjectMyAppMethodCalls.contains(it) }
