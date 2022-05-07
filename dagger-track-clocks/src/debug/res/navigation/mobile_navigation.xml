@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_tracker">
+
+    <fragment
+        android:id="@+id/navigation_tracker"
+        android:name="me.amanjeet.daggertrack.ui.tracker.TrackerFragment"
+        android:label="@string/title_tracker"
+        tools:layout="@layout/fragment_tracker" />
+
+    <fragment
+        android:id="@+id/navigation_about"
+        android:name="me.amanjeet.daggertrack.ui.about.AboutFragment"
+        android:label="@string/title_about"
+        tools:layout="@layout/fragment_about" />
+
+</navigation>

@@ -1,0 +1,9 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <activity
+            android:name="me.amanjeet.daggertrack.DaggerTrackActivity"
+            android:exported="false"
+            android:label="@string/title_activity_dagger_track"/>
+    </application>
+</manifest>

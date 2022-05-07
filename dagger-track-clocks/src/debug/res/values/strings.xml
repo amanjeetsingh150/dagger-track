@@ -1,0 +1,5 @@
+<resources>
+    <string name="title_activity_dagger_track">DaggerTrackActivity</string>
+    <string name="title_tracker">Tracker</string>
+    <string name="title_about">About</string>
+</resources>
